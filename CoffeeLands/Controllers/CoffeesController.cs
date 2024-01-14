@@ -20,9 +20,22 @@ namespace CoffeeLands.Controllers
         }
 
         // GET: Coffees
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchString)
         {
-            return View(await _context.Coffee.ToListAsync());
+            if (_context.Coffee == null)
+            {
+                return Problem("Entity set 'CoffeeLandsContext.Coffee'  is null.");
+            }
+
+            var coffee = from m in _context.Coffee
+                         select m;
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                coffee = coffee.Where(s => s.Name!.Contains(searchString));
+            }
+
+            return View(await coffee.ToListAsync());
         }
 
         // GET: Coffees/Details/5

@@ -2,8 +2,13 @@
 
 @{
     ViewData["Title"] = "Create";
+    Layout = "../Admin/Layout/_LayoutAdmin";
 }
 
+
+<div class="content-wrapper">
+    <section class="content">
+        <div class="container-fluid" style="padding-left: 15px;">
 <h1>Create</h1>
 
 <h4>Coffee</h4>
@@ -61,3 +66,6 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+        </div>
+    </section>
+</div>

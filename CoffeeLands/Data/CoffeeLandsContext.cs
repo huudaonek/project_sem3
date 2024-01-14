@@ -15,5 +15,9 @@ namespace CoffeeLands.Data
         }
 
         public DbSet<CoffeeLands.Models.Coffee> Coffee { get; set; } = default!;
+        public DbSet<CoffeeLands.Models.Category> Category { get; set; } = default!;
+        public DbSet<CoffeeLands.Models.Order> Order { get; set; } = default!;
+        //public DbSet<CoffeeLands.Models.Order_Detail> Order_Detail { get; set; } = default!;
+        public DbSet<CoffeeLands.Models.User> User { get; set; } = default!;
     }
 }

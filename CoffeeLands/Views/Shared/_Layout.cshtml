@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="~/css/flaticon.css">
     <link rel="stylesheet" href="~/css/icomoon.css">
     <link rel="stylesheet" href="~/css/style.css">
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
@@ -40,11 +41,11 @@
             </button>
             <div class="collapse navbar-collapse" id="ftco-nav">
                 <ul class="navbar-nav ml-auto">
-                    <li class="nav-item active"><a asp-area="" asp-controller="Coffees" asp-action="Index" class="nav-link">Home</a></li>
-                    <li class="nav-item"><a asp-area="" asp-controller="Coffees" asp-action="Create" class="nav-link">Menu</a></li>
-                    <li class="nav-item"><a asp-area="" asp-controller="Coffees" asp-action="Edit" class="nav-link">Services</a></li>
-                    <li class="nav-item"><a asp-area="" asp-controller="Coffees" asp-action="Details" class="nav-link">Blog</a></li>
-                    <li class="nav-item"><a asp-area="" asp-controller="Coffees" asp-action="Delete" class="nav-link">About</a></li>
+                    <li class="nav-item active"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Home</a></li>
+                    <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Menu" class="nav-link">Menu</a></li>
+                    <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Services" class="nav-link">Services</a></li>
+                    <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Blog" class="nav-link">Blog</a></li>
+                    <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="room.html" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Shop</a>
                         <div class="dropdown-menu" aria-labelledby="dropdown04">
