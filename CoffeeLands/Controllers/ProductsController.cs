@@ -10,35 +10,23 @@ using CoffeeLands.Models;
 
 namespace CoffeeLands.Controllers
 {
-    public class CoffeesController : Controller
+    public class ProductsController : Controller
     {
         private readonly CoffeeLandsContext _context;
 
-        public CoffeesController(CoffeeLandsContext context)
+        public ProductsController(CoffeeLandsContext context)
         {
             _context = context;
         }
 
-        // GET: Coffees
-        public async Task<IActionResult> Index(string searchString)
+        // GET: Products
+        public async Task<IActionResult> Index()
         {
-            if (_context.Coffee == null)
-            {
-                return Problem("Entity set 'CoffeeLandsContext.Coffee'  is null.");
-            }
-
-            var coffee = from m in _context.Coffee
-                         select m;
-
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                coffee = coffee.Where(s => s.Name!.Contains(searchString));
-            }
-
-            return View(await coffee.ToListAsync());
+            var coffeeLandsContext = _context.Product.Include(p => p.Category);
+            return View(await coffeeLandsContext.ToListAsync());
         }
 
-        // GET: Coffees/Details/5
+        // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -46,39 +34,52 @@ namespace CoffeeLands.Controllers
                 return NotFound();
             }
 
-            var coffee = await _context.Coffee
+            var product = await _context.Product
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (coffee == null)
+            if (product == null)
             {
                 return NotFound();
             }
 
-            return View(coffee);
+            return View(product);
         }
 
-        // GET: Coffees/Create
+        // GET: Products/Create
         public IActionResult Create()
         {
+            ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name");
             return View();
         }
 
-        // POST: Coffees/Create
+        // POST: Products/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Type,Price,Origin,Description,Status,Qty")] Coffee coffee)
+        public async Task<IActionResult> Create([Bind("Name,Type,Price,Origin,Description,Status,Qty,CategoryID")] Product product)
         {
-            if (ModelState.IsValid)
+            try
             {
-                _context.Add(coffee);
+                if (ModelState.IsValid)
+            {
+                _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(coffee);
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
+            }
+            ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name", product.CategoryID);
+            return View(product);
         }
 
-        // GET: Coffees/Edit/5
+        // GET: Products/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -86,22 +87,23 @@ namespace CoffeeLands.Controllers
                 return NotFound();
             }
 
-            var coffee = await _context.Coffee.FindAsync(id);
-            if (coffee == null)
+            var product = await _context.Product.FindAsync(id);
+            if (product == null)
             {
                 return NotFound();
             }
-            return View(coffee);
+            ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name", product.CategoryID);
+            return View(product);
         }
 
-        // POST: Coffees/Edit/5
+        // POST: Products/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,Price,Origin,Description,Status,Qty")] Coffee coffee)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,Price,Origin,Description,Status,Qty,CategoryID")] Product product)
         {
-            if (id != coffee.Id)
+            if (id != product.Id)
             {
                 return NotFound();
             }
@@ -110,12 +112,12 @@ namespace CoffeeLands.Controllers
             {
                 try
                 {
-                    _context.Update(coffee);
+                    _context.Update(product);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CoffeeExists(coffee.Id))
+                    if (!ProductExists(product.Id))
                     {
                         return NotFound();
                     }
@@ -126,10 +128,11 @@ namespace CoffeeLands.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(coffee);
+            ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name", product.CategoryID);
+            return View(product);
         }
 
-        // GET: Coffees/Delete/5
+        // GET: Products/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -137,34 +140,35 @@ namespace CoffeeLands.Controllers
                 return NotFound();
             }
 
-            var coffee = await _context.Coffee
+            var product = await _context.Product
+                .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (coffee == null)
+            if (product == null)
             {
                 return NotFound();
             }
 
-            return View(coffee);
+            return View(product);
         }
 
-        // POST: Coffees/Delete/5
+        // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var coffee = await _context.Coffee.FindAsync(id);
-            if (coffee != null)
+            var product = await _context.Product.FindAsync(id);
+            if (product != null)
             {
-                _context.Coffee.Remove(coffee);
+                _context.Product.Remove(product);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CoffeeExists(int id)
+        private bool ProductExists(int id)
         {
-            return _context.Coffee.Any(e => e.Id == id);
+            return _context.Product.Any(e => e.Id == id);
         }
     }
 }

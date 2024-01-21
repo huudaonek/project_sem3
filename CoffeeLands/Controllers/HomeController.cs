@@ -32,7 +32,7 @@ namespace CoffeeLands.Controllers
         // GET: Coffees
         public async Task<IActionResult> Menu()
         {
-            var products = await _context.Coffee.ToListAsync();
+            var products = await _context.Product.ToListAsync();
             return View(products);
         }
 

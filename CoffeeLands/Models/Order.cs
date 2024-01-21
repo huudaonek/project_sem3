@@ -23,5 +23,8 @@ namespace CoffeeLands.Models
 		public string? Shipping_method { get; set; }
 		[RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
 		public string? Payment_method { get; set; }
-	}
+        public int UserID { get; set; }
+
+        public User User { get; set; }
+    }
 }

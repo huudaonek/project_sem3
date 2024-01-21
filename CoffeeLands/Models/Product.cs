@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CoffeeLands.Models
 {
-    public class Coffee
+    public class Product
     {
         public int Id { get; set; }
         [RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
@@ -21,5 +21,8 @@ namespace CoffeeLands.Models
         public string? Status { get; set; }
         [RegularExpression(@"^\d+$"), Required, StringLength(3)]
         public string? Qty { get; set; }
+        public int CategoryID { get; set; }
+
+        public Category Category { get; set; }
     }
 }

@@ -16,12 +16,12 @@ public static class SeedData
                 DbContextOptions<CoffeeLandsContext>>()))
         {
             // Look for any movies.
-            if (context.Coffee.Any())
+            if (context.Product.Any())
             {
                 return;   // DB has been seeded
             }
-            context.Coffee.AddRange(
-                new Coffee
+            context.Product.AddRange(
+                new Product
                 {
                     Name = "Bee Coffee",
                     Type = "Coffe",
@@ -31,7 +31,7 @@ public static class SeedData
                     Status = "Con hang",
                     Qty = "12",
                 },
-                new Coffee
+                new Product
                 {
                     Name = "Weasel Coffee",
                     Type = "Coffe",
@@ -41,7 +41,7 @@ public static class SeedData
                     Status = "Con hang",
                     Qty = "12",
                 },
-                new Coffee
+                new Product
                 {
                     Name = "Apple Coffee",
                     Type = "Coffe",
@@ -51,7 +51,7 @@ public static class SeedData
                     Status = "Con hang",
                     Qty = "12",
                 },
-                new Coffee
+                new Product
                 {
                     Name = "Phin Coffee",
                     Type = "Coffe",

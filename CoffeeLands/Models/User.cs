@@ -14,5 +14,6 @@ namespace CoffeeLands.Models
 		public string? Password { get; set; }
 		[RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
 		public string? Role { get; set; }
-	}
+        public ICollection<Order> Orders { get; set; }
+    }
 }
