@@ -19,7 +19,7 @@ namespace CoffeeLands.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View("~/Views/Home/Pages/Index.cshtml");
         }
 
         private readonly CoffeeLandsContext _context;
@@ -38,22 +38,31 @@ namespace CoffeeLands.Controllers
 
         public IActionResult Services()
         {
-            return View();
+            return View("~/Views/Home/Pages/Services.cshtml");
         }
 
         public IActionResult Blog()
         {
-            return View();
+            return View("~/Views/Home/Pages/Blog.cshtml");
         }
 
         public IActionResult About()
         {
-            return View();
+            return View("~/Views/Home/Pages/About.cshtml");
         }
 
         public IActionResult Privacy()
         {
-            return View();
+            return View("~/Views/Home/Pages/Privacy.cshtml");
+        }
+        public IActionResult Login()
+        {
+            return View("~/Views/Home/Login/Login.cshtml");
+        }
+
+        public IActionResult Register()
+        {
+            return View("~/Views/Home/Login/Register.cshtml");
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

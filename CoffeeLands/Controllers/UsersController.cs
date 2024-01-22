@@ -56,6 +56,7 @@ namespace CoffeeLands.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Email,Password,Role")] User user)
         {
+
             if (ModelState.IsValid)
             {
                 _context.Add(user);
