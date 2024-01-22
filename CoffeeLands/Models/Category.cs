@@ -6,8 +6,7 @@ namespace CoffeeLands.Models
 	{
 		public int Id { get; set; }
 		[RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
-		public string? Name { get; set; }
-		public string? Slug { get; set; }
-        public ICollection<Product> Products { get; set; }
+		public string Name { get; set; }
+        public ICollection<Product>? Products { get; set; }
     }
 }

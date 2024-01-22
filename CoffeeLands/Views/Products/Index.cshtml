@@ -1,38 +1,27 @@
-﻿@model IEnumerable<CoffeeLands.Models.Product>
+﻿@model PaginatedList<CoffeeLands.Models.Product>
+
 @{
     ViewData["Title"] = "Index";
     Layout = "../Admin/Layout/_LayoutAdmin";
-    int id = 1;
 }
-@* @section Styles {
-    <link rel="stylesheet" href="~/css/test/product.css" />
-} *@
 
-@* @section Scripts {
-    <script src="~/js/your-script-name.js"></script>
-} *@
-
-@* <style>
-    .table{
-        background-color: #f1f1f1 !important;
-        color: green !important
-    }
-</style> *@
 
 <div class="content-wrapper">
     <section class="content">
         <div class="container-fluid">
+
+
             <h1>Index</h1>
             <p><a asp-action="Create">Create New</a></p>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Responsive Hover Table</h3>
+                            <h3 class="card-title">Products Table</h3>
                             <div class="card-tools">
-                                <form asp-controller="Products" asp-action="Index" method="get">
-                                    <div class="input-group input-group-sm" style="width: 150px;">
-                                        <input type="text" name="SearchString" class="form-control float-right" placeholder="Search">
+                                <form asp-action="Index" method="get">
+                                    <div class="input-group input-group-sm" style="width: 180px;">
+                                        <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control float-right" placeholder="Search">
                                         <div class="input-group-append">
                                             <button type="submit" class="btn btn-default">
                                                 <i class="fas fa-search"></i>
@@ -47,36 +36,42 @@
                             <table class="table table-hover text-nowrap">
                                 <thead>
                                     <tr>
-                                        <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Type</th>
+                                        <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Name</a></th>
                                         <th>Price</th>
-                                        <th>Origin</th>
                                         <th>Description</th>
-                                        <th>Status</th>
                                         <th>Qty</th>
-                                        <th>Action</th>
+                                        <th>Category</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td>@id</td>
-                                            <td>@item.Name</td>
-                                            <td>@item.Type</td>
-                                            <td>@item.Price</td>
-                                            <td>@item.Origin</td>
-                                            <td>@item.Description</td>
-                                            <td>@item.Status</td>
-                                            <td>@item.Qty</td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Name)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Price)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Description)
+                                            </td>
+
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Qty)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Category.Name)
+                                            </td>
                                             <td>
                                                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                                                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                                                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
                                             </td>
                                         </tr>
-                                        id++;
                                     }
                                 </tbody>
                             </table>
@@ -86,6 +81,29 @@
                     <!-- /.card -->
                 </div>
             </div>
+
+
+
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    Previous
+</a>
+<a asp-action="Index"
+   asp-route-sortOrder="@ViewData["CurrentSort"]"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextDisabled">
+    Next
+</a>
         </div>
     </section>
 </div>

@@ -20,11 +20,47 @@ namespace CoffeeLands.Controllers
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+    string sortOrder,
+    string currentFilter,
+    string searchString,
+    int? pageNumber)
         {
-            var coffeeLandsContext = _context.Product.Include(p => p.Category);
-            return View(await coffeeLandsContext.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+            
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var products = from s in _context.Product
+                           .Include(c => c.Category)
+                           select s;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                products = products.Where(s => s.Name.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    products = products.OrderByDescending(s => s.Name);
+                    break;
+                default:
+                    products = products.OrderBy(s => s.Name);
+                    break;
+            }
+
+            int pageSize = 3;
+            return View(await PaginatedList<Product>.CreateAsync(products.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
+        
 
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -48,7 +84,7 @@ namespace CoffeeLands.Controllers
         // GET: Products/Create
         public IActionResult Create()
         {
-            ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name");
+            PopulateCategoriesDropDownList();
             return View();
         }
 
@@ -57,17 +93,17 @@ namespace CoffeeLands.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Type,Price,Origin,Description,Status,Qty,CategoryID")] Product product)
+        public async Task<IActionResult> Create([Bind("Name,Price,Description,Qty,CategoryID")] Product product)
         {
             try
-            {
-                if (ModelState.IsValid)
+            { 
+            if (true)
             {
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            }
+        }
             catch (DbUpdateException /* ex */)
             {
                 //Log the error (uncomment ex variable name and write a log.
@@ -75,7 +111,8 @@ namespace CoffeeLands.Controllers
                     "Try again, and if the problem persists " +
                     "see your system administrator.");
             }
-            ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name", product.CategoryID);
+            PopulateCategoriesDropDownList(product.CategoryID);
+            //ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name", product.CategoryID);
             return View(product);
         }
 
@@ -87,49 +124,59 @@ namespace CoffeeLands.Controllers
                 return NotFound();
             }
 
-            var product = await _context.Product.FindAsync(id);
+            var product = await _context.Product
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
                 return NotFound();
             }
-            ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name", product.CategoryID);
+            PopulateCategoriesDropDownList(product.CategoryID);
             return View(product);
         }
 
         // POST: Products/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Type,Price,Origin,Description,Status,Qty,CategoryID")] Product product)
+        public async Task<IActionResult> EditPost(int? id)
         {
-            if (id != product.Id)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            var productToUpdate = await _context.Product
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(p => p.Id == id);
+            if (await TryUpdateModelAsync<Product>(productToUpdate,
+                "",
+                p => p.Name, p => p.Price, p => p.Description, p => p.Qty, p => p.CategoryID))
             {
                 try
                 {
-                    _context.Update(product);
+                    //_context.Update(product);
                     await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateException /* ex */)
                 {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
                 }
-                return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name", product.CategoryID);
-            return View(product);
+            PopulateCategoriesDropDownList(productToUpdate.CategoryID);
+            return View(productToUpdate);
+        }
+
+        private void PopulateCategoriesDropDownList(object selectedCategory = null)
+        {
+            var categoriesQuery = from d in _context.Category
+                                   orderby d.Name
+                                   select d;
+            ViewBag.CategoryID = new SelectList(categoriesQuery.AsNoTracking(), "Id", "Name", selectedCategory);
         }
 
         // GET: Products/Delete/5
@@ -142,6 +189,7 @@ namespace CoffeeLands.Controllers
 
             var product = await _context.Product
                 .Include(p => p.Category)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {

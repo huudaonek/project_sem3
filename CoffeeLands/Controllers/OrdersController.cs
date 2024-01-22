@@ -22,7 +22,8 @@ namespace CoffeeLands.Controllers
         // GET: Orders
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Order.ToListAsync());
+            var coffeeLandsContext = _context.Order.Include(o => o.User);
+            return View(await coffeeLandsContext.ToListAsync());
         }
 
         // GET: Orders/Details/5
@@ -34,6 +35,7 @@ namespace CoffeeLands.Controllers
             }
 
             var order = await _context.Order
+                .Include(o => o.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {
@@ -46,6 +48,7 @@ namespace CoffeeLands.Controllers
         // GET: Orders/Create
         public IActionResult Create()
         {
+            ViewData["UserID"] = new SelectList(_context.User, "Id", "Email");
             return View();
         }
 
@@ -54,7 +57,7 @@ namespace CoffeeLands.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Email,Tel,Address,Status,Grand_total,Shipping_method,Payment_method")] Order order)
+        public async Task<IActionResult> Create([Bind("Id,Name,Email,Tel,Address,Status,Grand_total,Shipping_method,Payment_method,UserID")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -62,6 +65,7 @@ namespace CoffeeLands.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["UserID"] = new SelectList(_context.User, "Id", "Email", order.UserID);
             return View(order);
         }
 
@@ -78,6 +82,7 @@ namespace CoffeeLands.Controllers
             {
                 return NotFound();
             }
+            ViewData["UserID"] = new SelectList(_context.User, "Id", "Email", order.UserID);
             return View(order);
         }
 
@@ -86,7 +91,7 @@ namespace CoffeeLands.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,Tel,Address,Status,Grand_total,Shipping_method,Payment_method")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,Tel,Address,Status,Grand_total,Shipping_method,Payment_method,UserID")] Order order)
         {
             if (id != order.Id)
             {
@@ -113,6 +118,7 @@ namespace CoffeeLands.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["UserID"] = new SelectList(_context.User, "Id", "Email", order.UserID);
             return View(order);
         }
 
@@ -125,6 +131,7 @@ namespace CoffeeLands.Controllers
             }
 
             var order = await _context.Order
+                .Include(o => o.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (order == null)
             {

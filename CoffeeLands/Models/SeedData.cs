@@ -16,53 +16,76 @@ public static class SeedData
                 DbContextOptions<CoffeeLandsContext>>()))
         {
             // Look for any movies.
-            if (context.Product.Any())
+            if (context.Category.Any())
             {
                 return;   // DB has been seeded
             }
-            context.Product.AddRange(
-                new Product
-                {
-                    Name = "Bee Coffee",
-                    Type = "Coffe",
-                    Price = 7.99M,
-                    Origin = "VIET NAM",
-                    Description = "Description Bee Coffee",
-                    Status = "Con hang",
-                    Qty = "12",
-                },
-                new Product
-                {
-                    Name = "Weasel Coffee",
-                    Type = "Coffe",
-                    Price = 1.11M,
-                    Origin = "AMERICA",
-                    Description = "Description Weasel Coffee",
-                    Status = "Con hang",
-                    Qty = "12",
-                },
-                new Product
-                {
-                    Name = "Apple Coffee",
-                    Type = "Coffe",
-                    Price = 2.22M,
-                    Origin = "Chinese",
-                    Description = "Description Apple Coffee",
-                    Status = "Con hang",
-                    Qty = "12",
-                },
-                new Product
-                {
-                    Name = "Phin Coffee",
-                    Type = "Coffe",
-                    Price = 10.10M,
-                    Origin = "VIET NAM",
-                    Description = "Description Phin Coffee",
-                    Status = "Con hang",
-                    Qty = "12",
-                }
-            );
+
+            var categories = new Category[]
+            {
+                new Category { Name="Coffee Fruit"},
+                new Category { Name="Coffee Animal"},
+                new Category { Name="Coffee"},
+            };
+            foreach (Category c in categories)
+            {
+                context.Category.Add(c);
+            }
             context.SaveChanges();
+
+            var products = new Product[]
+            {
+                new Product { Name = "Bee Coffee", Price = 7.99M, Description = "Description Bee Coffee",
+                Qty = "12", CategoryID = categories.Single(c => c.Name == "Coffee Animal").Id},
+                new Product { Name = "Weasel Coffee", Price = 1.11M, Description = "Description Weasel Coffee",
+                Qty = "12", CategoryID = categories.Single(c => c.Name == "Coffee Animal").Id},
+                new Product { Name = "Apple Coffee", Price = 2.22M, Description = "Description Apple Coffee",
+                Qty = "12", CategoryID = categories.Single(c => c.Name == "Coffee Fruit").Id},
+                new Product { Name = "Phin Coffee", Price = 10.10M, Description = "Description Phin Coffee",
+                Qty = "12", CategoryID = categories.Single(c => c.Name == "Coffee").Id},
+            };
+            foreach (Product p in products)
+            {
+                context.Product.Add(p);
+            }
+            context.SaveChanges();
+
+
+            //context.Product.AddRange(
+            //    new Product
+            //    {
+            //        Name = "Bee Coffee",
+            //        Price = 7.99M,
+            //        Description = "Description Bee Coffee",
+            //        Qty = "12",
+            //        CategoryID = categories.Single(c => c.Name == "Coffee Animal").Id
+            //    },
+            //    new Product
+            //    {
+            //        Name = "Weasel Coffee",
+            //        Price = 1.11M,
+            //        Description = "Description Weasel Coffee",
+            //        Qty = "12",
+            //        CategoryID = categories.Single(c => c.Name == "Coffee Animal").Id
+            //    },
+            //    new Product
+            //    {
+            //        Name = "Apple Coffee",
+            //        Price = 2.22M,
+            //        Description = "Description Apple Coffee",
+            //        Qty = "12",
+            //        CategoryID = categories.Single(c => c.Name == "Coffee Fruit").Id
+            //    },
+            //    new Product
+            //    {
+            //        Name = "Phin Coffee",
+            //        Price = 10.10M,
+            //        Description = "Description Phin Coffee",
+            //        Qty = "12",
+            //        CategoryID = categories.Single(c => c.Name == "Coffee").Id
+            //    }
+            //);
+            //context.SaveChanges();
         }
     }
 }

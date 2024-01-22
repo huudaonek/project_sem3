@@ -7,13 +7,13 @@ namespace CoffeeLands.Models
 	{
 		public int Id { get; set; }
 		[RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
-		public string? Name { get; set; }
+		public string Name { get; set; }
 		[RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
-		public string? Email { get; set; }
+		public string Email { get; set; }
 		[RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
-		public string? Password { get; set; }
+		public string Password { get; set; }
 		[RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
 		public string? Role { get; set; }
-        public ICollection<Order> Orders { get; set; }
+        public ICollection<Order>? Orders { get; set; }
     }
 }
