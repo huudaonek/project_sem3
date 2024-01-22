@@ -116,6 +116,12 @@ namespace CoffeeLands.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_Category_Name",
+                table: "Category",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Order_UserID",
                 table: "Order",
                 column: "UserID");
@@ -135,6 +141,18 @@ namespace CoffeeLands.Migrations
                 name: "IX_Product_CategoryID",
                 table: "Product",
                 column: "CategoryID");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Product_Name",
+                table: "Product",
+                column: "Name",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Name",
+                table: "User",
+                column: "Name",
+                unique: true);
         }
 
         /// <inheritdoc />

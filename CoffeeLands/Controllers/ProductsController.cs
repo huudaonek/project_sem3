@@ -96,14 +96,14 @@ namespace CoffeeLands.Controllers
         public async Task<IActionResult> Create([Bind("Name,Price,Description,Qty,CategoryID")] Product product)
         {
             try
-            { 
+            {
             if (true)
             {
                 _context.Add(product);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-        }
+            }
             catch (DbUpdateException /* ex */)
             {
                 //Log the error (uncomment ex variable name and write a log.

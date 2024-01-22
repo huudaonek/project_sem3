@@ -36,6 +36,9 @@ namespace CoffeeLands.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Category", (string)null);
                 });
 
@@ -154,6 +157,9 @@ namespace CoffeeLands.Migrations
 
                     b.HasIndex("CategoryID");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Product", (string)null);
                 });
 
@@ -186,6 +192,9 @@ namespace CoffeeLands.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("User", (string)null);
                 });

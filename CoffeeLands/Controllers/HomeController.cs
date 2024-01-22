@@ -55,15 +55,7 @@ namespace CoffeeLands.Controllers
         {
             return View("~/Views/Home/Pages/Privacy.cshtml");
         }
-        public IActionResult Login()
-        {
-            return View("~/Views/Home/Login/Login.cshtml");
-        }
-
-        public IActionResult Register()
-        {
-            return View("~/Views/Home/Login/Register.cshtml");
-        }
+        
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

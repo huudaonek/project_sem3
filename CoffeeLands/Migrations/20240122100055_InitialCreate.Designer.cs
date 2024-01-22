@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoffeeLands.Migrations
 {
     [DbContext(typeof(CoffeeLandsContext))]
-    [Migration("20240121152551_InitialCreate")]
+    [Migration("20240122100055_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -38,6 +38,9 @@ namespace CoffeeLands.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Category", (string)null);
                 });
@@ -157,6 +160,9 @@ namespace CoffeeLands.Migrations
 
                     b.HasIndex("CategoryID");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Product", (string)null);
                 });
 
@@ -189,6 +195,9 @@ namespace CoffeeLands.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("User", (string)null);
                 });

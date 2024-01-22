@@ -25,6 +25,16 @@ namespace CoffeeLands.Controllers
             return View(await _context.User.ToListAsync());
         }
 
+        //public IActionResult Login()
+        //{
+        //    return View("~/Views/Home/Login/Login.cshtml");
+        //}
+
+        //public IActionResult Register()
+        //{
+        //    return View("~/Views/Home/Login/Register.cshtml");
+        //}
+
         // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -46,7 +56,7 @@ namespace CoffeeLands.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
-            return View();
+            return View("~/Views/Home/Login/Register.cshtml");
         }
 
         // POST: Users/Create
