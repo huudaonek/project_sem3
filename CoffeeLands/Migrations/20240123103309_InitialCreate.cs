@@ -32,7 +32,7 @@ namespace CoffeeLands.Migrations
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Password = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false)
+                    Role = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -47,7 +47,7 @@ namespace CoffeeLands.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
                     Qty = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
                     CategoryID = table.Column<int>(type: "int", nullable: false)
                 },
@@ -72,10 +72,11 @@ namespace CoffeeLands.Migrations
                     Email = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Tel = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Status = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Grand_total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Shipping_method = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Payment_method = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    Is_paid = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "0"),
                     UserID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -125,12 +126,6 @@ namespace CoffeeLands.Migrations
                 name: "IX_Order_UserID",
                 table: "Order",
                 column: "UserID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_OrderProduct_OrderID",
-                table: "OrderProduct",
-                column: "OrderID",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderProduct_ProductID",

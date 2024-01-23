@@ -11,7 +11,7 @@ namespace CoffeeLands.Models
         
         [RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
         public string Name { get; set; }
-        [Range(1, 100), DataType(DataType.Currency)]
+        [DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Price { get; set; }
         [RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(100)]
@@ -20,6 +20,7 @@ namespace CoffeeLands.Models
         public string Qty { get; set; }
         public int CategoryID { get; set; }
         public Category Category { get; set; }
+        //public Cart? Cart { get; set; }
         public ICollection<OrderProduct>? OrderProducts { get; set; }
     }
 }

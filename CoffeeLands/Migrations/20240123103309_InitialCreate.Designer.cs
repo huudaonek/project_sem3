@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoffeeLands.Migrations
 {
     [DbContext(typeof(CoffeeLandsContext))]
-    [Migration("20240122100055_InitialCreate")]
+    [Migration("20240123103309_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -66,6 +66,9 @@ namespace CoffeeLands.Migrations
                     b.Property<decimal>("Grand_total")
                         .HasColumnType("decimal(18, 2)");
 
+                    b.Property<bool>("Is_paid")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -83,8 +86,7 @@ namespace CoffeeLands.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Tel")
                         .IsRequired()
@@ -118,9 +120,6 @@ namespace CoffeeLands.Migrations
                         .HasColumnType("nvarchar(10)");
 
                     b.HasKey("OrderID", "ProductID");
-
-                    b.HasIndex("OrderID")
-                        .IsUnique();
 
                     b.HasIndex("ProductID");
 
@@ -190,7 +189,6 @@ namespace CoffeeLands.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.Property<string>("Role")
-                        .IsRequired()
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
 
@@ -216,8 +214,8 @@ namespace CoffeeLands.Migrations
             modelBuilder.Entity("CoffeeLands.Models.OrderProduct", b =>
                 {
                     b.HasOne("CoffeeLands.Models.Order", "Order")
-                        .WithOne("OrderProduct")
-                        .HasForeignKey("CoffeeLands.Models.OrderProduct", "OrderID")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("OrderID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -250,8 +248,7 @@ namespace CoffeeLands.Migrations
 
             modelBuilder.Entity("CoffeeLands.Models.Order", b =>
                 {
-                    b.Navigation("OrderProduct")
-                        .IsRequired();
+                    b.Navigation("OrderProducts");
                 });
 
             modelBuilder.Entity("CoffeeLands.Models.Product", b =>

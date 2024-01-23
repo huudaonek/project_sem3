@@ -1,4 +1,4 @@
-﻿@model PaginatedList<CoffeeLands.Models.User>
+﻿@model PaginatedList<CoffeeLands.Models.OrderProduct>
 
 @{
     ViewData["Title"] = "Index";
@@ -19,7 +19,7 @@
                         <div class="card-header">
                             <h3 class="card-title">Products Table</h3>
                             <div class="card-tools">
-                                <form asp-action="Index" method="get">
+                                <form asp-controller="Admin" asp-action="OrderDetails" method="get">
                                     <div class="input-group input-group-sm" style="width: 180px;">
                                         <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" class="form-control float-right" placeholder="Search">
                                         <div class="input-group-append">
@@ -36,11 +36,12 @@
                             <table class="table table-hover text-nowrap">
                                 <thead>
                                     <tr>
-                                        <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Name</a></th>
-                                        <th>Email</th>
-                                        <th>Password</th>
-                                        @* <th>Role</th> *@
-                                        <th></th>
+                                        @* <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Name</a></th> *@
+                                        <th>OrderID</th>
+                                        <th>ProductID</th>
+                                        <th>Qty</th>
+                                        <th><a asp-controller="Admin" asp-action="OrderDetails" asp-route-sortOrder="@ViewData["PriceSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Price</a></th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -48,53 +49,50 @@
                                     {
                                         <tr>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Name)
+                                                @Html.DisplayFor(modelItem => item.Order.Id)
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Email)
+                                                @Html.DisplayFor(modelItem => item.Product.Id)
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Password)
+                                                @Html.DisplayFor(modelItem => item.Qty)
                                             </td>
-                                            @* <td>
-                                                @Html.DisplayFor(modelItem => item.Role)
-                                            </td> *@
                                             <td>
-                                                <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
+                                                @Html.DisplayFor(modelItem => item.Price)
                                             </td>
+                                            
+                                                                                        
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
-                        <!-- /.card-body -->
                     </div>
-                    <!-- /.card -->
                 </div>
             </div>
 
 
 
 
-@{
-    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-}
+            @{
+                var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+            }
 
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @prevDisabled">
-    Previous
-</a>
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @nextDisabled">
-    Next
-</a>
+            <a asp-controller="Admin" asp-action="OrderDetails"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex - 1)"
+               
+               class="btn btn-default @prevDisabled">
+                Previous
+            </a>
+            <a asp-controller="Admin" asp-action="OrderDetails"
+               asp-route-sortOrder="@ViewData["CurrentSort"]"
+               asp-route-pageNumber="@(Model.PageIndex + 1)"
+               
+               class="btn btn-default @nextDisabled">
+                Next
+            </a>
         </div>
     </section>
 </div>

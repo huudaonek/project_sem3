@@ -20,9 +20,44 @@ namespace CoffeeLands.Controllers
         }
 
         // GET: Users
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+    string sortOrder,
+    string currentFilter,
+    string searchString,
+    int? pageNumber)
         {
-            return View(await _context.User.ToListAsync());
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
+
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var users = from u in _context.User
+                        select u;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(s => s.Name.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    users = users.OrderByDescending(s => s.Name);
+                    break;
+                default:
+                    users = users.OrderBy(s => s.Name);
+                    break;
+            }
+
+            int pageSize = 3;
+            return View(await PaginatedList<User>.CreateAsync(users.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
         //public IActionResult Login()
@@ -56,7 +91,7 @@ namespace CoffeeLands.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
-            return View("~/Views/Home/Login/Register.cshtml");
+            return View();
         }
 
         // POST: Users/Create
@@ -64,14 +99,23 @@ namespace CoffeeLands.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Email,Password,Role")] User user)
+        public async Task<IActionResult> Create([Bind("Name,Email,Password")] User user)
         {
-
-            if (ModelState.IsValid)
+            try
+            {
+                if (true)
             {
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
+            }
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
             }
             return View(user);
         }
