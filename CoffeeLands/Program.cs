@@ -9,7 +9,25 @@ builder.Services.AddDbContext<CoffeeLandsContext>(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+
+
+
+//builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(2); //You can set Time in seconds, minutes
+});
+
+var provider = builder.Services.BuildServiceProvider();
+var config = provider.GetRequiredService<IConfiguration>();
+builder.Services.AddDbContext<CoffeeLandsContext>(item => item.UseSqlServer(config.GetConnectionString("CoffeeLandsContext")));
+
+
+
 var app = builder.Build();
+
 
 using (var scope = app.Services.CreateScope())
 {
@@ -28,6 +46,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseSession();
+
 
 app.UseRouting();
 

@@ -10,11 +10,12 @@ namespace CoffeeLands.Models
 		public string Name { get; set; }
 		[Required, StringLength(30)]
 		public string Email { get; set; }
-		[Required, StringLength(30)]
+		[DataType(DataType.Password),Required, StringLength(30)]
 		public string Password { get; set; }
 		[StringLength(30)]
 		public string? Role { get; set; }
         //public Cart? Cart { get; set; }
         public ICollection<Order>? Orders { get; set; }
+        //public ICollection<ProductCart>? ProductCart { get; set; }
     }
 }

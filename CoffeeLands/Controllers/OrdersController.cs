@@ -20,12 +20,65 @@ namespace CoffeeLands.Controllers
         }
 
         // GET: Orders
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+    string sortOrder,
+    string currentFilter,
+    string searchString,
+    int? pageNumber)
         {
-            var coffeeLandsContext = _context.Order.Include(o => o.User);
-            return View(await coffeeLandsContext.ToListAsync());
-        }
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
 
+            if (searchString != null)
+            {
+                pageNumber = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
+
+            ViewData["CurrentFilter"] = searchString;
+
+            var orders = from o in _context.Order
+                           .Include(u => u.User)
+                           select o;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                orders = orders.Where(s => s.Name.Contains(searchString));
+            }
+            switch (sortOrder)
+            {
+                case "name_desc":
+                    orders = orders.OrderByDescending(s => s.Name);
+                    break;
+                default:
+                    orders = orders.OrderBy(s => s.Name);
+                    break;
+            }
+
+            int pageSize = 2;
+            return View(await PaginatedList<Order>.CreateAsync(orders.AsNoTracking(), pageNumber ?? 1, pageSize));
+        }
+        public async Task<IActionResult> Checkout(decimal subTotal,decimal delivery, decimal discount, decimal grandTotal)
+        {
+            var checkUser = HttpContext.Session.GetString("UserSession");
+            if (string.IsNullOrEmpty(checkUser))
+            {
+                return RedirectToAction("Login", "Users");
+            }
+            else
+            {
+                ViewBag.MySession = checkUser.ToString();
+            }
+            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
+
+            ViewBag.SubTotal = subTotal;
+            ViewBag.Delivery = delivery;
+            ViewBag.Discount = discount;
+            ViewBag.GrandTotal = grandTotal;
+            return View();
+        }
         // GET: Orders/Details/5
         public async Task<IActionResult> Details(int? id)
         {

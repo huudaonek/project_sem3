@@ -46,9 +46,9 @@ namespace CoffeeLands.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Qty = table.Column<string>(type: "nvarchar(3)", maxLength: 3, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     CategoryID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -76,7 +76,7 @@ namespace CoffeeLands.Migrations
                     Shipping_method = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Payment_method = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Is_paid = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false, defaultValue: "0"),
+                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "0"),
                     UserID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -91,12 +91,36 @@ namespace CoffeeLands.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ProductCart",
+                columns: table => new
+                {
+                    CartProductId = table.Column<int>(type: "int", nullable: false),
+                    CartUserId = table.Column<int>(type: "int", nullable: false),
+                    Qty = table.Column<int>(type: "int", maxLength: 10, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.ForeignKey(
+                        name: "FK_ProductCart_Product_CartProductId",
+                        column: x => x.CartProductId,
+                        principalTable: "Product",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ProductCart_User_CartUserId",
+                        column: x => x.CartUserId,
+                        principalTable: "User",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderProduct",
                 columns: table => new
                 {
                     OrderID = table.Column<int>(type: "int", nullable: false),
                     ProductID = table.Column<int>(type: "int", nullable: false),
-                    Qty = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Qty = table.Column<int>(type: "int", maxLength: 10, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -144,6 +168,22 @@ namespace CoffeeLands.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ProductCart_CartProductId",
+                table: "ProductCart",
+                column: "CartProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductCart_CartUserId",
+                table: "ProductCart",
+                column: "CartUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_User_Email",
+                table: "User",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_User_Name",
                 table: "User",
                 column: "Name",
@@ -155,6 +195,9 @@ namespace CoffeeLands.Migrations
         {
             migrationBuilder.DropTable(
                 name: "OrderProduct");
+
+            migrationBuilder.DropTable(
+                name: "ProductCart");
 
             migrationBuilder.DropTable(
                 name: "Order");

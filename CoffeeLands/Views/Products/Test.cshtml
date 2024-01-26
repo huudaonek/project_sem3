@@ -1,0 +1,12 @@
+﻿@model CoffeeLands.Models.Product
+@{
+    ViewData["Title"] = "Test";
+    Layout = null;
+}
+@{
+    if (ViewBag.Cart != null)
+    {
+        <h1 style="color: red">@ViewBag.Cart</h1>
+    }
+
+}

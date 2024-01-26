@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoffeeLands.Migrations
 {
     [DbContext(typeof(CoffeeLandsContext))]
-    [Migration("20240123103309_InitialCreate")]
+    [Migration("20240125150515_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -86,7 +86,8 @@ namespace CoffeeLands.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("Tel")
                         .IsRequired()
@@ -114,10 +115,9 @@ namespace CoffeeLands.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");
 
-                    b.Property<string>("Qty")
-                        .IsRequired()
+                    b.Property<int>("Qty")
                         .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
+                        .HasColumnType("int");
 
                     b.HasKey("OrderID", "ProductID");
 
@@ -142,6 +142,10 @@ namespace CoffeeLands.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<string>("Image")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(30)
@@ -149,11 +153,6 @@ namespace CoffeeLands.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");
-
-                    b.Property<string>("Qty")
-                        .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("nvarchar(3)");
 
                     b.HasKey("Id");
 
@@ -163,6 +162,25 @@ namespace CoffeeLands.Migrations
                         .IsUnique();
 
                     b.ToTable("Product", (string)null);
+                });
+
+            modelBuilder.Entity("CoffeeLands.Models.ProductCart", b =>
+                {
+                    b.Property<int>("CartProductId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CartUserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Qty")
+                        .HasMaxLength(10)
+                        .HasColumnType("int");
+
+                    b.HasIndex("CartProductId");
+
+                    b.HasIndex("CartUserId");
+
+                    b.ToTable("ProductCart", (string)null);
                 });
 
             modelBuilder.Entity("CoffeeLands.Models.User", b =>
@@ -193,6 +211,9 @@ namespace CoffeeLands.Migrations
                         .HasColumnType("nvarchar(30)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("Name")
                         .IsUnique();
@@ -239,6 +260,25 @@ namespace CoffeeLands.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("CoffeeLands.Models.ProductCart", b =>
+                {
+                    b.HasOne("CoffeeLands.Models.Product", "CartProduct")
+                        .WithMany()
+                        .HasForeignKey("CartProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoffeeLands.Models.User", "CartUser")
+                        .WithMany()
+                        .HasForeignKey("CartUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CartProduct");
+
+                    b.Navigation("CartUser");
                 });
 
             modelBuilder.Entity("CoffeeLands.Models.Category", b =>

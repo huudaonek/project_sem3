@@ -2,6 +2,8 @@
 using CoffeeLands.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace CoffeeLands.Controllers
 {
@@ -16,6 +18,15 @@ namespace CoffeeLands.Controllers
         }
         public IActionResult Index()
         {
+            if (HttpContext.Session.GetString("Admin") != null)
+            {
+                ViewBag.UserAdmin = HttpContext.Session.GetString("Admin").ToString();
+            }
+            else
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             return View("~/Views/Admin/Pages/Index.cshtml");
         }
 

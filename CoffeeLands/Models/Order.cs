@@ -36,10 +36,7 @@ namespace CoffeeLands.Models
 		public bool Is_paid { get; set; }
         [RegularExpression(@"^[A-Za-z][a-zA-Z\s]*$"), Required, StringLength(50)]
         public string Status { get; set; }
-        public Order()
-        {
-            Is_paid = false;
-        }
+        
 
         //private string GetFormattedStatus()
         //{

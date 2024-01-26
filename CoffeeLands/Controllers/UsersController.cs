@@ -7,16 +7,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CoffeeLands.Data;
 using CoffeeLands.Models;
+using Newtonsoft.Json;
 
 namespace CoffeeLands.Controllers
 {
     public class UsersController : Controller
     {
         private readonly CoffeeLandsContext _context;
-
+        
         public UsersController(CoffeeLandsContext context)
         {
             _context = context;
+           
         }
 
         // GET: Users
@@ -60,16 +62,6 @@ namespace CoffeeLands.Controllers
             return View(await PaginatedList<User>.CreateAsync(users.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
-        //public IActionResult Login()
-        //{
-        //    return View("~/Views/Home/Login/Login.cshtml");
-        //}
-
-        //public IActionResult Register()
-        //{
-        //    return View("~/Views/Home/Login/Register.cshtml");
-        //}
-
         // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -89,10 +81,53 @@ namespace CoffeeLands.Controllers
         }
 
         // GET: Users/Create
-        public IActionResult Create()
+        public IActionResult Register()
         {
-            return View();
+            return View("~/Views/Home/Account/Register.cshtml");
         }
+        public IActionResult Login()
+        {
+            if (HttpContext.Session.GetString("UserSession") != null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return View("~/Views/Home/Account/Login.cshtml");
+        }
+        [HttpPost]
+        public async Task<IActionResult> Login(User user)
+        {
+            var myUser = await _context.User
+                    .FirstOrDefaultAsync(m => m.Email == user.Email && m.Password == user.Password);
+
+            if (myUser != null)
+            {
+                HttpContext.Session.SetString("UserSession", myUser.Name);
+                HttpContext.Session.SetInt32("UserId", myUser.Id);
+                if (myUser.Role == "ADMIN")
+                {
+                    HttpContext.Session.SetString("Admin", myUser.Name);
+                }
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                ViewBag.Message = "Login failed..";
+            }
+
+            return View("~/Views/Home/Account/Login.cshtml");
+        }
+
+        public IActionResult Logout()
+        {
+            if (HttpContext.Session.GetString("UserSession") != null)
+            {
+                HttpContext.Session.Remove("UserSession");
+                return RedirectToAction("Index", "Home");
+            }
+            return View("~/Views/Home/Pages/Index.cshtml");
+        }
+
+
 
         // POST: Users/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
@@ -105,10 +140,10 @@ namespace CoffeeLands.Controllers
             {
                 if (true)
             {
-                _context.Add(user);
+                _context.Add(user); 
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
+                    return RedirectToAction("Index", "Home");
+                }
             }
             catch (DbUpdateException /* ex */)
             {
@@ -117,7 +152,7 @@ namespace CoffeeLands.Controllers
                     "Try again, and if the problem persists " +
                     "see your system administrator.");
             }
-            return View(user);
+            return View("~/Views/Home/Account/Register.cshtml", user);
         }
 
         // GET: Users/Edit/5
