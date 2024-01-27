@@ -32,8 +32,9 @@
 
 } *@
 @{
-    if (ViewBag.Cart != null && !string.IsNullOrEmpty(ViewBag.Cart.ToString()))
+    if (ViewBag.Cart != null && ((List<ProductCart>)ViewBag.Cart).Any())
     {
+        <p>@ViewBag.Cart</p>
         <section class="ftco-section ftco-cart">
             <div class="container">
                 <div class="row">

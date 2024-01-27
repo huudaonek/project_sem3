@@ -211,13 +211,14 @@ namespace CoffeeLands.Controllers
 
 
             var productListJson = HttpContext.Session.GetString("Cart");
-            ViewBag.Cart = HttpContext.Session.GetString("Cart");
+            //ViewBag.Cart = HttpContext.Session.GetString("Cart");
             if (!string.IsNullOrEmpty(productListJson))
             {
                 decimal totalProduct = 0;
                 decimal subtotal = 0;
                 var productList = JsonConvert.DeserializeObject<List<ProductCart>>(productListJson);
-                foreach(ProductCart productCart in productList )
+                ViewBag.Cart = productList;
+                foreach (ProductCart productCart in productList )
                 {
                     totalProduct = productCart.Qty * productCart.CartProduct.Price;
                     subtotal += totalProduct;
@@ -375,45 +376,51 @@ namespace CoffeeLands.Controllers
                 return NotFound();
             }
 
-            long size = files.Sum(f => f.Length);
-
-            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
-
-            var filePaths = new List<string>();
-            foreach (var formFile in files)
-            {
-                //Check if the file has a valid extension
-                var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
-                if (string.IsNullOrEmpty(fileExtension) || !allowedExtensions.Contains(fileExtension))
-                {
-                    return BadRequest("Invalid file extension. Allowed extensions are: " + string.Join(",", allowedExtensions));
-                }
-
-                if (formFile.Length > 0)
-                {
-                    //change the folder path to where you want to store the upload files
-                    var uploadFolderPath = Path.Combine(_hostingEnvironment.WebRootPath, "customer/images/uploads");
-                    Directory.CreateDirectory(uploadFolderPath);
-
-                    var fileName = Path.GetRandomFileName() + fileExtension;
-                    var filePath = Path.Combine(uploadFolderPath, fileName);
-                    filePaths.Add(filePath);
-
-                    using (var stream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await formFile.CopyToAsync(stream);
-                    }
-                }
-            }
-
-
             var productToUpdate = await _context.Product
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(p => p.Id == id);
-            if (filePaths.Count > 0)
+            if (productToUpdate != null)
             {
-                var Image = "/customer/images/uploads/" + Path.GetFileName(filePaths[0]);
+                if (files != null && files.Count > 0)
+                {
+                    long size = files.Sum(f => f.Length);
+
+                    var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+
+                    var filePaths = new List<string>();
+                    foreach (var formFile in files)
+                    {
+                        //Check if the file has a valid extension
+                        var fileExtension = Path.GetExtension(formFile.FileName).ToLowerInvariant();
+                        if (string.IsNullOrEmpty(fileExtension) || !allowedExtensions.Contains(fileExtension))
+                        {
+                            return BadRequest("Invalid file extension. Allowed extensions are: " + string.Join(",", allowedExtensions));
+                        }
+
+                        if (formFile.Length > 0)
+                        {
+                            //change the folder path to where you want to store the upload files
+                            var uploadFolderPath = Path.Combine(_hostingEnvironment.WebRootPath, "customer/images/uploads");
+                            Directory.CreateDirectory(uploadFolderPath);
+
+                            var fileName = Path.GetRandomFileName() + fileExtension;
+                            var filePath = Path.Combine(uploadFolderPath, fileName);
+                            filePaths.Add(filePath);
+
+                            using (var stream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await formFile.CopyToAsync(stream);
+                            }
+                        }
+                    }
+                    productToUpdate.Image = "/customer/images/uploads/" + Path.GetFileName(filePaths[0]);
+                }
             }
+            
+
+
+            
+            
 
             if (await TryUpdateModelAsync<Product>(productToUpdate,
                 "",
