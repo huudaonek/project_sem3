@@ -49,8 +49,8 @@ namespace CoffeeLands.Controllers
             ViewData["PriceSortParm"] = String.IsNullOrEmpty(sortOrder) ? "price_desc" : "";
 
 
-            var orderProducts = from op in _context.OrderProduct
-                .Include(o => o.Order)
+            var orderProducts = from op in _context.OrderDetail
+                .Include(o => o.OrderProduct)
                 .Include(p => p.Product)
                 select op;
 
@@ -64,9 +64,9 @@ namespace CoffeeLands.Controllers
                     break;
             }
 
-            int pageSize = 2;
+            int pageSize = 10;
             
-            return View("~/Views/Admin/Pages/OrderDetail.cshtml", await PaginatedList<OrderProduct>.CreateAsync(orderProducts.AsNoTracking(), pageNumber ?? 1, pageSize));
+            return View("~/Views/Admin/Pages/OrderDetail.cshtml", await PaginatedList<OrderDetail>.CreateAsync(orderProducts.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
 

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoffeeLands.Migrations
 {
     [DbContext(typeof(CoffeeLandsContext))]
-    [Migration("20240125150515_InitialCreate")]
+    [Migration("20240128141818_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -45,7 +45,29 @@ namespace CoffeeLands.Migrations
                     b.ToTable("Category", (string)null);
                 });
 
-            modelBuilder.Entity("CoffeeLands.Models.Order", b =>
+            modelBuilder.Entity("CoffeeLands.Models.OrderDetail", b =>
+                {
+                    b.Property<int>("OrderProductID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductID")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18, 2)");
+
+                    b.Property<int>("Qty")
+                        .HasMaxLength(10)
+                        .HasColumnType("int");
+
+                    b.HasKey("OrderProductID", "ProductID");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("OrderDetail", (string)null);
+                });
+
+            modelBuilder.Entity("CoffeeLands.Models.OrderProduct", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -76,18 +98,14 @@ namespace CoffeeLands.Migrations
 
                     b.Property<string>("Payment_method")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Shipping_method")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<string>("Tel")
                         .IsRequired()
@@ -100,28 +118,6 @@ namespace CoffeeLands.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("UserID");
-
-                    b.ToTable("Order", (string)null);
-                });
-
-            modelBuilder.Entity("CoffeeLands.Models.OrderProduct", b =>
-                {
-                    b.Property<int>("OrderID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductID")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("Price")
-                        .HasColumnType("decimal(18, 2)");
-
-                    b.Property<int>("Qty")
-                        .HasMaxLength(10)
-                        .HasColumnType("int");
-
-                    b.HasKey("OrderID", "ProductID");
-
-                    b.HasIndex("ProductID");
 
                     b.ToTable("OrderProduct", (string)null);
                 });
@@ -166,7 +162,10 @@ namespace CoffeeLands.Migrations
 
             modelBuilder.Entity("CoffeeLands.Models.ProductCart", b =>
                 {
-                    b.Property<int>("CartProductId")
+                    b.Property<int>("UerID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductID")
                         .HasColumnType("int");
 
                     b.Property<int>("CartUserId")
@@ -176,9 +175,11 @@ namespace CoffeeLands.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("int");
 
-                    b.HasIndex("CartProductId");
+                    b.HasKey("UerID", "ProductID");
 
                     b.HasIndex("CartUserId");
+
+                    b.HasIndex("ProductID");
 
                     b.ToTable("ProductCart", (string)null);
                 });
@@ -221,34 +222,34 @@ namespace CoffeeLands.Migrations
                     b.ToTable("User", (string)null);
                 });
 
-            modelBuilder.Entity("CoffeeLands.Models.Order", b =>
+            modelBuilder.Entity("CoffeeLands.Models.OrderDetail", b =>
+                {
+                    b.HasOne("CoffeeLands.Models.OrderProduct", "OrderProduct")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("OrderProductID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CoffeeLands.Models.Product", "Product")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("ProductID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OrderProduct");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("CoffeeLands.Models.OrderProduct", b =>
                 {
                     b.HasOne("CoffeeLands.Models.User", "User")
-                        .WithMany("Orders")
+                        .WithMany("OrderProducts")
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("CoffeeLands.Models.OrderProduct", b =>
-                {
-                    b.HasOne("CoffeeLands.Models.Order", "Order")
-                        .WithMany("OrderProducts")
-                        .HasForeignKey("OrderID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CoffeeLands.Models.Product", "Product")
-                        .WithMany("OrderProducts")
-                        .HasForeignKey("ProductID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("CoffeeLands.Models.Product", b =>
@@ -264,15 +265,15 @@ namespace CoffeeLands.Migrations
 
             modelBuilder.Entity("CoffeeLands.Models.ProductCart", b =>
                 {
-                    b.HasOne("CoffeeLands.Models.Product", "CartProduct")
-                        .WithMany()
-                        .HasForeignKey("CartProductId")
+                    b.HasOne("CoffeeLands.Models.User", "CartUser")
+                        .WithMany("ProductCarts")
+                        .HasForeignKey("CartUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CoffeeLands.Models.User", "CartUser")
-                        .WithMany()
-                        .HasForeignKey("CartUserId")
+                    b.HasOne("CoffeeLands.Models.Product", "CartProduct")
+                        .WithMany("ProductCarts")
+                        .HasForeignKey("ProductID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -286,19 +287,23 @@ namespace CoffeeLands.Migrations
                     b.Navigation("Products");
                 });
 
-            modelBuilder.Entity("CoffeeLands.Models.Order", b =>
+            modelBuilder.Entity("CoffeeLands.Models.OrderProduct", b =>
                 {
-                    b.Navigation("OrderProducts");
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("CoffeeLands.Models.Product", b =>
                 {
-                    b.Navigation("OrderProducts");
+                    b.Navigation("OrderDetails");
+
+                    b.Navigation("ProductCarts");
                 });
 
             modelBuilder.Entity("CoffeeLands.Models.User", b =>
                 {
-                    b.Navigation("Orders");
+                    b.Navigation("OrderProducts");
+
+                    b.Navigation("ProductCarts");
                 });
 #pragma warning restore 612, 618
         }

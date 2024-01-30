@@ -1,4 +1,4 @@
-﻿@model CoffeeLands.Models.Order
+﻿@model CoffeeLands.Models.OrderProduct
 
 @{
     ViewData["Title"] = "Details";
@@ -8,72 +8,94 @@
 <div class="content-wrapper">
     <section class="content">
         <div class="container-fluid">
-<h1>Details</h1>
+            <h1>Details</h1>
 
-<div>
-    <h4>Order</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Tel)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Tel)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Address)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Address)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Grand_total)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Grand_total)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Shipping_method)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Shipping_method)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Payment_method)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Payment_method)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.User)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.User.Email)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+            <div>
+                <h4>Order</h4>
+                <hr />
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Name)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Name)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Email)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Email)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Tel)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Tel)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Address)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Address)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Status)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @switch ((int)Model.Status)
+                        {
+                            case (int)OrderStatus.PENDING:
+                                <span class='text-secondary'>Chờ xác nhận</span>
+                                break;
+                            case (int)OrderStatus.CONFIRMED:
+                                <span class='text-info'>Đã xác nhận</span>
+                                break;
+                            case (int)OrderStatus.SHIPPING:
+                                <span class='text-lightblue'>Đang giao hàng</span>
+                                break;
+                            case (int)OrderStatus.SHIPPED:
+                                <span class='text-pink'>Đã giao hàng</span>
+                                break;
+                            case (int)OrderStatus.COMPLETE:
+                                <span class='text-success'>Hoàn thành</span>
+                                break;
+                            case (int)OrderStatus.CANCEL:
+                                <span class='text-danger'>Huỷ</span>
+                                break;
+                            default:
+                                <span>Không xác định</span>
+                                break;
+                        }
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Grand_total)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Grand_total)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Shipping_method)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Shipping_method)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.Payment_method)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.Payment_method)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.User)
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.User.Email)
+                    </dd>
+                </dl>
+            </div>
+            <div>
+                <a asp-action="Index">Back to List</a>
+            </div>
         </div>
     </section>
 </div>

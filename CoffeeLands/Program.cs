@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using CoffeeLands.Data;
 using CoffeeLands.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CoffeeLandsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CoffeeLandsContext") ?? throw new InvalidOperationException("Connection string 'CoffeeLandsContext' not found.")));
@@ -12,18 +14,32 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
-
+builder.Services.AddMvc().AddSessionStateTempDataProvider();
 
 //builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(2); //You can set Time in seconds, minutes
-});
+builder.Services.AddSession();
 
 var provider = builder.Services.BuildServiceProvider();
 var config = provider.GetRequiredService<IConfiguration>();
 builder.Services.AddDbContext<CoffeeLandsContext>(item => item.UseSqlServer(config.GetConnectionString("CoffeeLandsContext")));
 
+builder.Services.AddRazorPages();
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSingleton(x =>
+	new PaypalClient(
+		builder.Configuration["PayPalOptions:AppId"],
+		builder.Configuration["PayPalOptions:AppSecret"],
+		builder.Configuration["PayPalOptions:Mode"]
+	)
+);
+
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+//    options =>
+//{
+//    options.LoginPath = "/Users/Login";
+//    options.AccessDeniedPath = "/Users/AccessDenied";
+//});
 
 
 var app = builder.Build();
@@ -51,6 +67,8 @@ app.UseSession();
 
 
 app.UseRouting();
+
+//app.UseAuthentication();
 
 app.UseAuthorization();
 

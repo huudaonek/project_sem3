@@ -19,19 +19,19 @@ namespace CoffeeLands.Data
         public DbSet<CoffeeLands.Models.Category> Category { get; set; } = default!;
         public DbSet<CoffeeLands.Models.Product> Product { get; set; } = default!;
         public DbSet<CoffeeLands.Models.ProductCart> ProductCart { get; set; } = default!;
-        public DbSet<CoffeeLands.Models.Order> Order { get; set; } = default!;
         public DbSet<CoffeeLands.Models.OrderProduct> OrderProduct { get; set; } = default!;
+		public DbSet<CoffeeLands.Models.OrderDetail> OrderDetail { get; set; } = default!;
 
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    if (!optionsBuilder.IsConfigured)
-        //    {
+		//protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+		//{
+		//    if (!optionsBuilder.IsConfigured)
+		//    {
 
-        //    }
-        //}
+		//    }
+		//}
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable("User")
                 .HasIndex(p => p.Name).IsUnique();
@@ -42,10 +42,10 @@ namespace CoffeeLands.Data
             modelBuilder.Entity<Product>().ToTable("Product")
                 .HasIndex(p => p.Name).IsUnique();
             modelBuilder.Entity<ProductCart>().ToTable("ProductCart")
-                .HasNoKey();
-            modelBuilder.Entity<Order>().ToTable("Order");
-            modelBuilder.Entity<OrderProduct>().ToTable("OrderProduct")
-                .HasKey(op => new { op.OrderID, op.ProductID });
+                .HasKey(pc => new { pc.UerID, pc.ProductID });
+            modelBuilder.Entity<OrderProduct>().ToTable("OrderProduct");
+            modelBuilder.Entity<OrderDetail>().ToTable("OrderDetail")
+                .HasKey(op => new { op.OrderProductID, op.ProductID });
             //modelBuilder.Entity<Cart>().ToTable("Cart")
             //    .HasKey(c => new { c.UserID, c.ProductID });
 

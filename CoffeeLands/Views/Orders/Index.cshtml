@@ -1,4 +1,4 @@
-﻿@model PaginatedList<CoffeeLands.Models.Order>
+﻿@model PaginatedList<CoffeeLands.Models.OrderProduct>
 
 @{
     ViewData["Title"] = "Index";
@@ -8,16 +8,12 @@
 
 <div class="content-wrapper">
     <section class="content">
-        <div class="container-fluid">
-
-
-            <h1>Index</h1>
-            
+        <div class="container-fluid" style="padding-bottom:50px">
+            <h3>Order Table</h3>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Products Table</h3>
                             <div class="card-tools">
                                 <form asp-action="Index" method="get">
                                     <div class="input-group input-group-sm" style="width: 180px;">
@@ -31,11 +27,11 @@
                                 </form>
                             </div>
                         </div>
-                        <!-- /.card-header -->
                         <div class="card-body table-responsive p-0">
                             <table class="table table-hover text-nowrap">
                                 <thead>
                                     <tr>
+                                        <th>ID</th>
                                         <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Name</a></th>
                                         <th>Tel</th>
                                         <th>Address</th>
@@ -50,9 +46,11 @@
                                     {
                                         <tr>
                                             <td>
+                                                @Html.DisplayFor(modelItem => item.Id)
+                                            </td>
+                                            <td>
                                                 @Html.DisplayFor(modelItem => item.Name)
                                             </td>
-                                            
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.Tel)
                                             </td>
@@ -60,7 +58,30 @@
                                                 @Html.DisplayFor(modelItem => item.Address)
                                             </td>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Status)
+                                                @switch ((int)item.Status)
+                                                {
+                                                    case (int)OrderStatus.PENDING:
+                                                        <span class='text-secondary'>Chưa thanh toán</span>
+                                                        break;
+                                                    case (int)OrderStatus.CONFIRMED:
+                                                        <span class='text-info'>Đã thanh toán</span>
+                                                        break;
+                                                    case (int)OrderStatus.SHIPPING:
+                                                        <span class='text-lightblue'>Đang giao hàng</span>
+                                                        break;
+                                                    case (int)OrderStatus.SHIPPED:
+                                                        <span class='text-pink'>Đã giao hàng</span>
+                                                        break;
+                                                    case (int)OrderStatus.COMPLETE:
+                                                        <span class='text-success'>Hoàn thành</span>
+                                                        break;
+                                                    case (int)OrderStatus.CANCEL:
+                                                        <span class='text-danger'>Huỷ</span>
+                                                        break;
+                                                    default:
+                                                        <span>Không xác định</span>
+                                                        break;
+                                                }
                                             </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.Grand_total)
@@ -69,43 +90,37 @@
                                                 @Html.DisplayFor(modelItem => item.User.Name)
                                             </td>
                                             <td>
-                                                
-                                                <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
-                                               
+                                                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
-                        <!-- /.card-body -->
                     </div>
-                    <!-- /.card -->
                 </div>
             </div>
 
-
-
-
-@{
-    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-}
-
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @prevDisabled">
-    Previous
-</a>
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @nextDisabled">
-    Next
-</a>
+            @{
+                var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+            }
+            <div style="float:right">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model.PageIndex - 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-default @prevDisabled">
+                    Previous
+                </a>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model.PageIndex + 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-default @nextDisabled">
+                    Next
+                </a>
+            </div>
         </div>
     </section>
 </div>

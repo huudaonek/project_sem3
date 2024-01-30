@@ -1,0 +1,20 @@
+﻿@model CoffeeLands.Models.OrderProduct
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = null;
+}
+
+    <style>
+        .pay{
+            
+            text-decoration:none;
+            
+        }
+    </style>
+
+
+<a asp-route-id="@Model.Id" asp-action="Pay" class="pay">Payyyyyy</a> <br/>
+@* <a asp-route-id="@Model.Id" asp-action="paymentOnDelivery" class="pay">Payment on delivery!</a> *@
+
+@* <p>@ViewBag.orderproductList</p> *@

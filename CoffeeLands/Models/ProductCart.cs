@@ -5,10 +5,13 @@ namespace CoffeeLands.Models
 {
     public class ProductCart
     {
-        public Product CartProduct { get; set; }
-        public User CartUser { get; set; }
+        public int ProductID { get; set; }
+        public int UerID { get; set; }
         [RegularExpression(@"^[1-9][0-9]*$"), Required, StringLength(10)]
         public int Qty { get; set; }
+        public Product CartProduct { get; set; }
+        public User CartUser { get; set; }
+               
     }
 }
 

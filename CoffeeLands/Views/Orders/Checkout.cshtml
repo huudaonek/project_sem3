@@ -1,6 +1,13 @@
-﻿@model CoffeeLands.Models.Order
+﻿@model CoffeeLands.Models.OrderProduct
 @{
 	ViewData["Title"] = "Checkout";
+}
+@section Styles{
+	<style>
+		.p-cart{
+			padding-left: 20px;
+		}
+	</style>
 }
 <section class="home-slider owl-carousel">
 
@@ -21,21 +28,25 @@
 
 <section class="ftco-section">
 	<div class="container">
+		<form asp-area="" asp-controller="Orders" asp-action="PlaceOrder"  class="billing-form ftco-bg-dark p-3 p-md-5" method="post">
 		<div class="row">
 			<div class="col-xl-8 ftco-animate">
-				<form asp-area="" asp-controller="Orders" asp-action="PlaceOrder" class="billing-form ftco-bg-dark p-3 p-md-5" method="post">
+				<div class="billing-form ftco-bg-dark p-3 p-md-5" >
 					<h3 class="mb-4 billing-heading">Billing Details</h3>
 					<div class="row align-items-end">
-						<div class="col-md-6">
+						<div class="col-md-12">
 							<div class="form-group">
 								<label for="firstname">Full Name</label>
-								<input type="text" asp-for="Name" class="form-control" placeholder="">
+								<input type="text" asp-for="Name" class="form-control" placeholder="Enter Full Name">
+									<span asp-validation-for="Name" class="text-danger"></span>
 							</div>
 						</div>
-						<div class="col-md-6">
+						<div class="w-100"></div>
+						<div class="col-md-12">
 							<div class="form-group">
 								<label for="phone">Phone</label>
-								<input type="text" class="form-control" placeholder="">
+								<input type="text" asp-for="Tel" class="form-control" placeholder="Enter Phone">
+									<span asp-validation-for="Tel" class="text-danger"></span>
 							</div>
 						</div>
 						
@@ -43,107 +54,60 @@
 						<div class="col-md-12">
 							<div class="form-group">
 								<label for="emailaddress">Email</label>
-								<input type="text" class="form-control" placeholder="">
+								<input type="text" asp-for="Email" class="form-control" placeholder="Enter Email">
+									<span asp-validation-for="Email" class="text-danger"></span>
 							</div>
 						</div>
 						<div class="w-100"></div>
 						<div class="col-md-12">
 							<div class="form-group">
 								<label for="streetaddress">Address</label>
-								<input type="text" class="form-control" placeholder="House number and street name">
+									<input type="text" asp-for="Address" class="form-control" placeholder="Enter Address">
+									<span asp-validation-for="Address" class="text-danger"></span>
 							</div>
 						</div>
 						
 						<div class="w-100"></div>
-						
-					</div>
-				</form><!-- END -->
 
-
-
-				<div class="row mt-5 pt-3 d-flex">
-					<div class="col-md-6 d-flex">
-						<div class="cart-detail cart-total ftco-bg-dark p-3 p-md-4">
-							<h3 class="billing-heading mb-4">Cart Total</h3>
-							<p class="d-flex">
-								<span>Subtotal</span>
-								<span>$@ViewBag.SubTotal</span>
-							</p>
-							<p class="d-flex">
-								<span>Delivery</span>
-								<span>$@ViewBag.Delivery</span>
-							</p>
-							<p class="d-flex">
-								<span>Discount</span>
-								<span>$@ViewBag.Discount</span>
-							</p>
-							<hr>
-							<p class="d-flex total-price">
-								<span>Total</span>
-								<span>$@ViewBag.GrandTotal</span>
-							</p>
+						<div class="checkout__input__checkbox">
+							<label for="shippingmethod">Shipping Method</label> </br>
+							<label for="acc">
+								<input name="shipping_method" value = "express" type = "radio" id = "acc" >
+								Express
+								<span class="checkmark"></span>
+								</label>
+								<br />
+								<label for="free">
+									<input name="shipping_method"  value = "free_shipping" type = "radio" id = "free" >
+								Free Shipping
+								<span class="checkmark"></span>
+							</label>
 						</div>
 					</div>
-					<div class="col-md-6">
-						<div class="cart-detail ftco-bg-dark p-3 p-md-4">
-							<h3 class="billing-heading mb-4">Payment Method</h3>
-							<div class="form-group">
-								<div class="col-md-12">
-									<div class="radio">
-										<label><input type="radio" name="optradio" class="mr-2"> Direct Bank Tranfer</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-md-12">
-									<div class="radio">
-										<label><input type="radio" name="optradio" class="mr-2"> Check Payment</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-md-12">
-									<div class="radio">
-										<label><input type="radio" name="optradio" class="mr-2"> Paypal</label>
-									</div>
-								</div>
-							</div>
-							<div class="form-group">
-								<div class="col-md-12">
-									<div class="checkbox">
-										<label><input type="checkbox" value="" class="mr-2"> I have read and accept the terms and conditions</label>
-									</div>
-								</div>
-							</div>
-							<p><a href="#" class="btn btn-primary py-3 px-4">Place an order</a></p>
-						</div>
-					</div>
-				</div>
+				</div><!-- END -->
 			</div> <!-- .col-md-8 -->
-
-
-
 
 			<div class="col-xl-4 sidebar ftco-animate">
 				<div style="margin-bottom:20px;">
-					<div class="cart-detail cart-total ftco-bg-dark" style="padding: 30px 0px 30px 50px !important ;">
+					<div class="cart-detail cart-total ftco-bg-dark p-3 p-md-4">
 						<h3 class="billing-heading mb-4">Cart Total</h3>
-						<p class="d-flex">
+						<p class="d-flex p-cart">
 							<span>Subtotal</span>
-							<span>$@ViewBag.SubTotal</span>
+								<span>$@ViewBag.Subtotal</span>
 						</p>
-						<p class="d-flex">
+						<p class="d-flex p-cart">
 							<span>Delivery</span>
-							<span>$@ViewBag.Delivery</span>
+							<span id="deliveryValue">$0</span>
 						</p>
-						<p class="d-flex">
-							<span>Discount</span>
-							<span>$@ViewBag.Discount</span>
+						<p class="d-flex p-cart" >
+							<span>VAT</span>
+							<span id="discountValue">10%</span>
 						</p>
 						<hr>
-						<p class="d-flex total-price">
+						<p class="d-flex total-price p-cart">
 							<span>Total</span>
-							<span>$@ViewBag.GrandTotal</span>
+							<span id="totalValue">$@ViewBag.GrandTotal</span>
+								<input type="hidden" name="grandTotal" value="@ViewBag.GrandTotal" />
 						</p>
 					</div>
 				</div>
@@ -153,24 +117,31 @@
 						<div class="form-group">
 							<div class="col-md-12">
 								<div class="radio">
-									<label><input type="radio" name="optradio" class="mr-2"> Direct Bank Tranfer</label>
+									<label><input type="radio" name="payment_method" value="bank" class="mr-2"> Direct Bank Tranfer</label>
 								</div>
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="col-md-12">
 								<div class="radio">
-									<label><input type="radio" name="optradio" class="mr-2"> Check Payment</label>
+									<label><input type="radio" name="payment_method" value="momo" class="mr-2"> Momo</label>
 								</div>
 							</div>
 						</div>
 						<div class="form-group">
 							<div class="col-md-12">
 								<div class="radio">
-									<label><input type="radio" name="optradio" class="mr-2"> Paypal</label>
+									<label><input type="radio" name="payment_method" value="paypal" class="mr-2"> Paypal</label>
 								</div>
 							</div>
 						</div>
+							<div class="form-group">
+								<div class="col-md-12">
+									<div class="radio">
+										<label><input type="radio" name="payment_method" value="paymentOnDelivery" class="mr-2"> Payment On Delivery</label>
+									</div>
+								</div>
+							</div>
 						<div class="form-group">
 							<div class="col-md-12">
 								<div class="checkbox">
@@ -178,11 +149,92 @@
 								</div>
 							</div>
 						</div>
-						<p><a href="#" class="btn btn-primary py-3 px-4">Place an order</a></p>
+							<button type="submit" class="btn btn-primary py-3 px-4" style="background-color: #c49b63;color: #000 !important; margin-bottom: 20px;">Place an order</button>
+							@* <div id="paypal-button-container" style="max-width:1000px;"></div> *@
+							@* <a class="btn btn-primary" href="/Home/PaymentWithPaypal" ></a> *@
+						@* <p><a href="#" class="btn btn-primary py-3 px-4">Place an order</a></p> *@
 					</div>
 				</div>
 			</div>
 
 		</div>
+	</form>
 	</div>
 </section> <!-- .section -->
+@section Scripts {
+	<script src="https://www.paypal.com/sdk/js?client-id=@ViewBag.PaypalClientId"></script>
+
+	@* <script>
+
+		paypal.Buttons({
+			style: {
+				layout: 'vertical',
+				color: 'silver',
+				tagline: 'false'
+			},
+			createOrder: (data, actions) => {
+				return fetch("/Orders/create-paypal-order", {
+					method: "POST",
+				}).then((response) => {
+					if (!response.ok) {
+						return response.json().then(error => { throw error; });
+					}
+					return response.json();
+				}).then((order) => order.id)
+					.catch(error => alert(error.message));
+			},
+			onApprove: (data, actions) => {
+				return fetch(`/Orders/capture-paypal-order?orderId=${data.orderID}`, {
+					method: "POST",
+				}).then((response) => {
+					if (!response.ok) {
+						return response.json().then(error => { throw error; });
+					}
+					//Đổi địa chỉ tới action thông báo thành công
+					window.location.href = "/Orders/Success";
+				}).catch(error => alert(error.message));
+			}
+		}).render('#paypal-button-container');
+		
+	</script> *@
+
+
+
+	@* <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+	<script>
+		$(document).ready(function () {
+			$('input[name="shipping_method"]').change(function () {
+				var subtotal = parseFloat('@ViewBag.SubTotal');
+				var discount = parseFloat('@ViewBag.Discount');
+
+				// Kiểm tra xem phương thức vận chuyển là "Express"
+				if ($(this).val() === "express") {
+					// Cập nhật giá vận chuyển
+					var deliveryFee = 10;
+					// Cập nhật giá trị trong ViewBag (nếu cần)
+					// ...
+
+					// Tính tổng tiền
+					var total = subtotal - discount + deliveryFee;
+					// Thực hiện cập nhật giá trị trên View
+					$('#deliveryValue').text('$' + deliveryFee.toFixed(2));
+					$('#discountValue').text('$' + discount.toFixed(2));
+					$('#totalValue').text('$' + total.toFixed(2));
+				} else {
+					// Nếu không phải là "Express", giả sử giá vận chuyển là 0
+					var deliveryFee = 0;
+					// Cập nhật giá trị trong ViewBag (nếu cần)
+					// ...
+
+					// Tính tổng tiền
+					var total = subtotal - discount + deliveryFee;
+					
+					// Thực hiện cập nhật giá trị trên View
+					$('#deliveryValue').text('$' + deliveryFee.toFixed(2));
+					$('#discountValue').text('$' + discount.toFixed(2));
+		            $('#totalValue').text('$' + total.toFixed(2));
+				}
+			});
+		});
+	</script> *@
+}

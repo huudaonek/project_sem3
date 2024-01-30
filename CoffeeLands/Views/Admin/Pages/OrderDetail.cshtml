@@ -1,4 +1,4 @@
-﻿@model PaginatedList<CoffeeLands.Models.OrderProduct>
+﻿@model PaginatedList<CoffeeLands.Models.OrderDetail>
 
 @{
     ViewData["Title"] = "Index";
@@ -8,15 +8,12 @@
 
 <div class="content-wrapper">
     <section class="content">
-        <div class="container-fluid">
-
-            <h1>Index</h1>
-            
+        <div class="container-fluid" style="padding-bottom: 50px;">
+            <h3>Order Product Table</h3>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Products Table</h3>
                             <div class="card-tools">
                                 <form asp-controller="Admin" asp-action="OrderDetails" method="get">
                                     <div class="input-group input-group-sm" style="width: 180px;">
@@ -30,17 +27,15 @@
                                 </form>
                             </div>
                         </div>
-                        <!-- /.card-header -->
                         <div class="card-body table-responsive p-0">
                             <table class="table table-hover text-nowrap">
                                 <thead>
                                     <tr>
-                                        @* <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Name</a></th> *@
                                         <th>OrderID</th>
                                         <th>ProductID</th>
                                         <th>Qty</th>
                                         <th><a asp-controller="Admin" asp-action="OrderDetails" asp-route-sortOrder="@ViewData["PriceSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Price</a></th>
-                                        
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -48,7 +43,7 @@
                                     {
                                         <tr>
                                             <td>
-                                                @Html.DisplayFor(modelItem => item.Order.Id)
+                                                @Html.DisplayFor(modelItem => item.OrderProduct.Id)
                                             </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.Product.Id)
@@ -59,8 +54,6 @@
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.Price)
                                             </td>
-                                            
-                                                                                        
                                         </tr>
                                     }
                                 </tbody>
@@ -70,28 +63,24 @@
                 </div>
             </div>
 
-
-
-
             @{
                 var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
                 var nextDisabled = !Model.HasNextPage ? "disabled" : "";
             }
-
-            <a asp-controller="Admin" asp-action="OrderDetails"
-               asp-route-sortOrder="@ViewData["CurrentSort"]"
-               asp-route-pageNumber="@(Model.PageIndex - 1)"
-               
-               class="btn btn-default @prevDisabled">
-                Previous
-            </a>
-            <a asp-controller="Admin" asp-action="OrderDetails"
-               asp-route-sortOrder="@ViewData["CurrentSort"]"
-               asp-route-pageNumber="@(Model.PageIndex + 1)"
-               
-               class="btn btn-default @nextDisabled">
-                Next
-            </a>
+            <div style="float:right">
+                <a asp-controller="Admin" asp-action="OrderDetails"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model.PageIndex - 1)"
+                   class="btn btn-default @prevDisabled">
+                    Previous
+                </a>
+                <a asp-controller="Admin" asp-action="OrderDetails"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model.PageIndex + 1)"
+                   class="btn btn-default @nextDisabled">
+                    Next
+                </a>
+            </div>
         </div>
     </section>
 </div>

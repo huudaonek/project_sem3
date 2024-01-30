@@ -13,6 +13,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoffeeLands.Controllers
 {
@@ -175,6 +176,7 @@ namespace CoffeeLands.Controllers
 
 
         //Cart
+        
         public async Task<IActionResult> Cart()
         {
             var checkUser = HttpContext.Session.GetString("UserSession");

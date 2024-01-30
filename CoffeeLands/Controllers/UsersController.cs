@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using CoffeeLands.Data;
 using CoffeeLands.Models;
 using Newtonsoft.Json;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 
 namespace CoffeeLands.Controllers
 {
@@ -58,7 +62,7 @@ namespace CoffeeLands.Controllers
                     break;
             }
 
-            int pageSize = 3;
+            int pageSize = 10;
             return View(await PaginatedList<User>.CreateAsync(users.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
@@ -85,46 +89,116 @@ namespace CoffeeLands.Controllers
         {
             return View("~/Views/Home/Account/Register.cshtml");
         }
-        public IActionResult Login()
+		#region Login
+		public IActionResult Login(string? ReturnUrl)
         {
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                return RedirectToAction("Index", "Home");
-            }
+            ViewBag.ReturnUrl = ReturnUrl;
+
+            //if (HttpContext.Session.GetString("UserSession") != null)
+            //{
+            //    return RedirectToAction("Index", "Home");
+            //}
             return View("~/Views/Home/Account/Login.cshtml");
         }
         [HttpPost]
-        public async Task<IActionResult> Login(User user)
+        public async Task<IActionResult> Login(User user, string? ReturnUrl)
         {
-            var myUser = await _context.User
-                    .FirstOrDefaultAsync(m => m.Email == user.Email && m.Password == user.Password);
+            //ViewBag.ReturnUrl = ReturnUrl;
+            //         if (true)
+            //         {
+            //             var myUser = _context.User.SingleOrDefault(u => u.Email == user.Email && u.Password == user.Password);
+            //             if(myUser == null)
+            //             {
+            //                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+            //             }
+            //             else
+            //             {
+            //                 if(myUser.Email != user.Email || myUser.Password != user.Password)
+            //                 {
+            //                     ModelState.AddModelError("Error!", "Tài khoản hoặc mật khẩu không đúng!");
+            //                 }
+            //                 else
+            //                 {
+            //                     var claims = new List<Claim>
+            //                     {
+            //                         new Claim(ClaimTypes.Email, myUser.Email),
+            //                         new Claim(ClaimTypes.Name, myUser.Name),
+            //                         //new Claim("userID", user.Id)
 
-            if (myUser != null)
+            //                         new Claim(ClaimTypes.Role, myUser.Role)
+
+            //                     };
+
+            //                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            //                     var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+            //                     await HttpContext.SignInAsync(claimsPrincipal);
+
+            //                     HttpContext.Session.SetString("UserSession", myUser.Name);
+            //                     HttpContext.Session.SetInt32("UserId", myUser.Id);
+
+
+
+            //                     if (myUser.Role == "ADMIN")
+            //                     {
+            //                         HttpContext.Session.SetString("Admin", myUser.Name);
+            //                     }
+
+            //                     if (Url.IsLocalUrl(ReturnUrl))
+            //                     {
+            //                         return Redirect(ReturnUrl);
+            //                     }
+            //                     else
+            //                     {
+            //                         return Redirect("/");
+            //                     }
+
+            //                 }
+            //             }
+            //         }
+
+
+
+            ViewBag.ReturnUrl = ReturnUrl;
+            if (true)
             {
-                HttpContext.Session.SetString("UserSession", myUser.Name);
-                HttpContext.Session.SetInt32("UserId", myUser.Id);
-                if (myUser.Role == "ADMIN")
+                var myUser = _context.User.SingleOrDefault(u => u.Email == user.Email && u.Password == user.Password);
+                if (myUser == null)
                 {
-                    HttpContext.Session.SetString("Admin", myUser.Name);
+                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
                 }
-                return RedirectToAction("Index", "Home");
+                else
+                {
+                    if (myUser.Email != user.Email || myUser.Password != user.Password)
+                    {
+                        ModelState.AddModelError("Error!", "Tài khoản hoặc mật khẩu không đúng!");
+                    }
+                    else
+                    {
+                        HttpContext.Session.SetString("UserSession", myUser.Name);
+                        HttpContext.Session.SetInt32("UserId", myUser.Id);
+                        if (myUser.Role == "ADMIN")
+                        {
+                            HttpContext.Session.SetString("Admin", myUser.Name);
+                        }                     
+                            return Redirect("/");
+                    }
+                }
             }
-            else
-            {
-                ViewBag.Message = "Login failed..";
-            }
-
             return View("~/Views/Home/Account/Login.cshtml");
         }
-
-        public IActionResult Logout()
+        #endregion
+        
+		public async Task<IActionResult> Logout()
         {
+            //await HttpContext.SignOutAsync();
+
             if (HttpContext.Session.GetString("UserSession") != null)
             {
                 HttpContext.Session.Remove("UserSession");
                 return RedirectToAction("Index", "Home");
             }
-            return View("~/Views/Home/Pages/Index.cshtml");
+            return Redirect("/");
         }
 
 
@@ -142,7 +216,7 @@ namespace CoffeeLands.Controllers
             {
                 _context.Add(user); 
                 await _context.SaveChangesAsync();
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Login", "Users");
                 }
             }
             catch (DbUpdateException /* ex */)

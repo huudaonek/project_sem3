@@ -3,8 +3,6 @@
     ViewData["Title"] = "Cart";
     decimal total = 0;
     decimal subtotal = 0;
-    decimal delivery = 0;
-    decimal discount = 3;
     decimal grandTotal = 0;
 }
 
@@ -34,7 +32,7 @@
 @{
     if (ViewBag.Cart != null && ((List<ProductCart>)ViewBag.Cart).Any())
     {
-        <p>@ViewBag.Cart</p>
+        // <p>@ViewBag.Cart</p>
         <section class="ftco-section ftco-cart">
             <div class="container">
                 <div class="row">
@@ -96,15 +94,11 @@
                                 <h3>Cart Totals</h3>
                                 <p class="d-flex">
                                     <span>Subtotal</span>
-                                    <span>$@subtotal</span>
+                                <span class="cart-subtotal">$@subtotal</span>
                                 </p>
                                 <p class="d-flex">
-                                    <span>Delivery</span>
-                                    <span>$@delivery</span>
-                                </p>
-                                <p class="d-flex">
-                                    <span>Discount</span>
-                                    <span>$@discount</span>
+                                    <span>VAT</span>
+                                    <span>10%</span>
                                 </p>
                                 <hr>
                                 @{
@@ -114,18 +108,18 @@
                                     }
                                     else
                                     {
-                                        grandTotal = subtotal - delivery - discount;
+                                        grandTotal = subtotal * 1.1m;
                                     }
 
                                 }
                                 <p class="d-flex total-price">
                                     <span>Total</span>
-                                    <span>$@grandTotal</span>
+                                <span class="cart-grandtotal">$@grandTotal</span>
                                 </p>
                             </div>
                             <p class="text-center">
                                 <a asp-area="" asp-controller="Orders" asp-action="Checkout"
-                                   asp-route-SubTotal="@subtotal" asp-route-Delivery="@delivery" asp-route-Discount="@discount" asp-route-GrandTotal="@grandTotal"
+                                   
                                    class="btn btn-primary py-3 px-4">Proceed to Checkout</a>
                                 
 
@@ -199,3 +193,44 @@
     </div>
 </section>
 
+@section Scripts{
+    // <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    // <script>
+    //     $(document).ready(function () {
+    //         // Sự kiện thay đổi số lượng
+    //         $('.quantity').on('change', function () {
+    //             updateCartItem($(this));
+    //         });
+
+    //         // Hàm cập nhật giá trị sản phẩm và tổng cộng
+    //         function updateCartItem(quantityInput) {
+    //             var row = quantityInput.closest('tr');
+    //             var price = parseFloat(row.find('.price').text().replace('$', ''));
+    //             var quantity = parseInt(quantityInput.val(), 10);
+    //             var total = price * quantity;
+
+    //             // Cập nhật giá trị tổng cho sản phẩm cụ thể
+    //             row.find('.total').text('$' + total.toFixed(2));
+
+    //             // Cập nhật tổng số lượng và tổng cộng
+    //             updateCartTotal();
+    //         }
+
+    //         // Hàm cập nhật tổng cộng của giỏ hàng
+    //         function updateCartTotal() {
+    //             var subtotal = 0;
+    //             $('.total').each(function () {
+    //                 subtotal += parseFloat($(this).text().replace('$', ''));
+    //             });
+
+    //             // Cập nhật giá trị subtotal trên giao diện
+    //             $('.cart-subtotal').text('$' + subtotal.toFixed(2));
+
+    //             // Cập nhật giá trị grandtotal trên giao diện (có thể thêm giảm giá nếu cần)
+    //              // Thay thế giảm giá thực của bạn
+    //             var grandTotal = subtotal - discount;
+    //             $('.cart-grandtotal').text('$' + grandTotal.toFixed(2));
+    //         }
+    //     });
+    // </script>
+}

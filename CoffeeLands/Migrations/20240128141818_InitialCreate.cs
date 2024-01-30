@@ -63,7 +63,7 @@ namespace CoffeeLands.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Order",
+                name: "OrderProduct",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -73,17 +73,17 @@ namespace CoffeeLands.Migrations
                     Tel = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
                     Address = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Grand_total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Shipping_method = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    Payment_method = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    Shipping_method = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Payment_method = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Is_paid = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false, defaultValue: "0"),
+                    Status = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     UserID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Order", x => x.Id);
+                    table.PrimaryKey("PK_OrderProduct", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Order_User_UserID",
+                        name: "FK_OrderProduct_User_UserID",
                         column: x => x.UserID,
                         principalTable: "User",
                         principalColumn: "Id",
@@ -94,15 +94,17 @@ namespace CoffeeLands.Migrations
                 name: "ProductCart",
                 columns: table => new
                 {
-                    CartProductId = table.Column<int>(type: "int", nullable: false),
-                    CartUserId = table.Column<int>(type: "int", nullable: false),
-                    Qty = table.Column<int>(type: "int", maxLength: 10, nullable: false)
+                    ProductID = table.Column<int>(type: "int", nullable: false),
+                    UerID = table.Column<int>(type: "int", nullable: false),
+                    Qty = table.Column<int>(type: "int", maxLength: 10, nullable: false),
+                    CartUserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
+                    table.PrimaryKey("PK_ProductCart", x => new { x.UerID, x.ProductID });
                     table.ForeignKey(
-                        name: "FK_ProductCart_Product_CartProductId",
-                        column: x => x.CartProductId,
+                        name: "FK_ProductCart_Product_ProductID",
+                        column: x => x.ProductID,
                         principalTable: "Product",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -115,25 +117,25 @@ namespace CoffeeLands.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderProduct",
+                name: "OrderDetail",
                 columns: table => new
                 {
-                    OrderID = table.Column<int>(type: "int", nullable: false),
+                    OrderProductID = table.Column<int>(type: "int", nullable: false),
                     ProductID = table.Column<int>(type: "int", nullable: false),
                     Qty = table.Column<int>(type: "int", maxLength: 10, nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_OrderProduct", x => new { x.OrderID, x.ProductID });
+                    table.PrimaryKey("PK_OrderDetail", x => new { x.OrderProductID, x.ProductID });
                     table.ForeignKey(
-                        name: "FK_OrderProduct_Order_OrderID",
-                        column: x => x.OrderID,
-                        principalTable: "Order",
+                        name: "FK_OrderDetail_OrderProduct_OrderProductID",
+                        column: x => x.OrderProductID,
+                        principalTable: "OrderProduct",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_OrderProduct_Product_ProductID",
+                        name: "FK_OrderDetail_Product_ProductID",
                         column: x => x.ProductID,
                         principalTable: "Product",
                         principalColumn: "Id",
@@ -147,14 +149,14 @@ namespace CoffeeLands.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Order_UserID",
-                table: "Order",
-                column: "UserID");
+                name: "IX_OrderDetail_ProductID",
+                table: "OrderDetail",
+                column: "ProductID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderProduct_ProductID",
+                name: "IX_OrderProduct_UserID",
                 table: "OrderProduct",
-                column: "ProductID");
+                column: "UserID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Product_CategoryID",
@@ -168,14 +170,14 @@ namespace CoffeeLands.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductCart_CartProductId",
-                table: "ProductCart",
-                column: "CartProductId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductCart_CartUserId",
                 table: "ProductCart",
                 column: "CartUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductCart_ProductID",
+                table: "ProductCart",
+                column: "ProductID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_User_Email",
@@ -194,13 +196,13 @@ namespace CoffeeLands.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "OrderProduct");
+                name: "OrderDetail");
 
             migrationBuilder.DropTable(
                 name: "ProductCart");
 
             migrationBuilder.DropTable(
-                name: "Order");
+                name: "OrderProduct");
 
             migrationBuilder.DropTable(
                 name: "Product");

@@ -8,16 +8,12 @@
 
 <div class="content-wrapper">
     <section class="content">
-        <div class="container-fluid">
-
-
-            <h1>Index</h1>
-            
+        <div class="container-fluid" style="padding-bottom: 50px;">
+            <h3>User Table</h3>
             <div class="row">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header">
-                            <h3 class="card-title">Products Table</h3>
                             <div class="card-tools">
                                 <form asp-action="Index" method="get">
                                     <div class="input-group input-group-sm" style="width: 180px;">
@@ -31,7 +27,6 @@
                                 </form>
                             </div>
                         </div>
-                        <!-- /.card-header -->
                         <div class="card-body table-responsive p-0">
                             <table class="table table-hover text-nowrap">
                                 <thead>
@@ -39,7 +34,6 @@
                                         <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Name</a></th>
                                         <th>Email</th>
                                         <th>Password</th>
-                                        @* <th>Role</th> *@
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -56,45 +50,38 @@
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.Password)
                                             </td>
-                                            @* <td>
-                                                @Html.DisplayFor(modelItem => item.Role)
-                                            </td> *@
                                             <td>
-                                                <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
+                                                <a asp-action="Details" asp-route-id="@item.Id">Details</a>
                                             </td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
-                        <!-- /.card-body -->
                     </div>
-                    <!-- /.card -->
                 </div>
             </div>
 
-
-
-
-@{
-    var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
-    var nextDisabled = !Model.HasNextPage ? "disabled" : "";
-}
-
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @prevDisabled">
-    Previous
-</a>
-<a asp-action="Index"
-   asp-route-sortOrder="@ViewData["CurrentSort"]"
-   asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
-   class="btn btn-default @nextDisabled">
-    Next
-</a>
+            @{
+                var prevDisabled = !Model.HasPreviousPage ? "disabled" : "";
+                var nextDisabled = !Model.HasNextPage ? "disabled" : "";
+            }
+            <div style="float:right">
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model.PageIndex - 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-default @prevDisabled">
+                    Previous
+                </a>
+                <a asp-action="Index"
+                   asp-route-sortOrder="@ViewData["CurrentSort"]"
+                   asp-route-pageNumber="@(Model.PageIndex + 1)"
+                   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+                   class="btn btn-default @nextDisabled">
+                    Next
+                </a>
+            </div>
         </div>
     </section>
 </div>
