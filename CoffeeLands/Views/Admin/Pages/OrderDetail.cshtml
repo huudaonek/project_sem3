@@ -31,10 +31,10 @@
                             <table class="table table-hover text-nowrap">
                                 <thead>
                                     <tr>
-                                        <th>OrderID</th>
+                                        <th><a asp-controller="Admin" asp-action="OrderDetails" asp-route-sortOrder="@ViewData["OrderSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">OrderID</a></th>
                                         <th>ProductID</th>
                                         <th>Qty</th>
-                                        <th><a asp-controller="Admin" asp-action="OrderDetails" asp-route-sortOrder="@ViewData["PriceSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Price</a></th>
+                                        <th>Price</th>
 
                                     </tr>
                                 </thead>

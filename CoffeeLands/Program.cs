@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using CoffeeLands.Data;
 using CoffeeLands.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Newtonsoft.Json;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CoffeeLandsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CoffeeLandsContext") ?? throw new InvalidOperationException("Connection string 'CoffeeLandsContext' not found.")));
@@ -16,7 +17,6 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 builder.Services.AddMvc().AddSessionStateTempDataProvider();
 
-//builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession();
 
 var provider = builder.Services.BuildServiceProvider();
@@ -25,14 +25,6 @@ builder.Services.AddDbContext<CoffeeLandsContext>(item => item.UseSqlServer(conf
 
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddSingleton(x =>
-	new PaypalClient(
-		builder.Configuration["PayPalOptions:AppId"],
-		builder.Configuration["PayPalOptions:AppSecret"],
-		builder.Configuration["PayPalOptions:Mode"]
-	)
-);
 
 //builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
 //    options =>

@@ -28,7 +28,7 @@
 
 <section class="ftco-section">
 	<div class="container">
-		<form asp-area="" asp-controller="Orders" asp-action="PlaceOrder"  class="billing-form ftco-bg-dark p-3 p-md-5" method="post">
+		<form asp-area="" asp-controller="Orders" asp-action="PlaceOrder" class="billing-form ftco-bg-dark p-3 p-md-5" method="post">
 		<div class="row">
 			<div class="col-xl-8 ftco-animate">
 				<div class="billing-form ftco-bg-dark p-3 p-md-5" >
@@ -68,7 +68,6 @@
 						</div>
 						
 						<div class="w-100"></div>
-
 						<div class="checkout__input__checkbox">
 							<label for="shippingmethod">Shipping Method</label> </br>
 							<label for="acc">
@@ -150,9 +149,6 @@
 							</div>
 						</div>
 							<button type="submit" class="btn btn-primary py-3 px-4" style="background-color: #c49b63;color: #000 !important; margin-bottom: 20px;">Place an order</button>
-							@* <div id="paypal-button-container" style="max-width:1000px;"></div> *@
-							@* <a class="btn btn-primary" href="/Home/PaymentWithPaypal" ></a> *@
-						@* <p><a href="#" class="btn btn-primary py-3 px-4">Place an order</a></p> *@
 					</div>
 				</div>
 			</div>
@@ -161,80 +157,3 @@
 	</form>
 	</div>
 </section> <!-- .section -->
-@section Scripts {
-	<script src="https://www.paypal.com/sdk/js?client-id=@ViewBag.PaypalClientId"></script>
-
-	@* <script>
-
-		paypal.Buttons({
-			style: {
-				layout: 'vertical',
-				color: 'silver',
-				tagline: 'false'
-			},
-			createOrder: (data, actions) => {
-				return fetch("/Orders/create-paypal-order", {
-					method: "POST",
-				}).then((response) => {
-					if (!response.ok) {
-						return response.json().then(error => { throw error; });
-					}
-					return response.json();
-				}).then((order) => order.id)
-					.catch(error => alert(error.message));
-			},
-			onApprove: (data, actions) => {
-				return fetch(`/Orders/capture-paypal-order?orderId=${data.orderID}`, {
-					method: "POST",
-				}).then((response) => {
-					if (!response.ok) {
-						return response.json().then(error => { throw error; });
-					}
-					//Đổi địa chỉ tới action thông báo thành công
-					window.location.href = "/Orders/Success";
-				}).catch(error => alert(error.message));
-			}
-		}).render('#paypal-button-container');
-		
-	</script> *@
-
-
-
-	@* <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-	<script>
-		$(document).ready(function () {
-			$('input[name="shipping_method"]').change(function () {
-				var subtotal = parseFloat('@ViewBag.SubTotal');
-				var discount = parseFloat('@ViewBag.Discount');
-
-				// Kiểm tra xem phương thức vận chuyển là "Express"
-				if ($(this).val() === "express") {
-					// Cập nhật giá vận chuyển
-					var deliveryFee = 10;
-					// Cập nhật giá trị trong ViewBag (nếu cần)
-					// ...
-
-					// Tính tổng tiền
-					var total = subtotal - discount + deliveryFee;
-					// Thực hiện cập nhật giá trị trên View
-					$('#deliveryValue').text('$' + deliveryFee.toFixed(2));
-					$('#discountValue').text('$' + discount.toFixed(2));
-					$('#totalValue').text('$' + total.toFixed(2));
-				} else {
-					// Nếu không phải là "Express", giả sử giá vận chuyển là 0
-					var deliveryFee = 0;
-					// Cập nhật giá trị trong ViewBag (nếu cần)
-					// ...
-
-					// Tính tổng tiền
-					var total = subtotal - discount + deliveryFee;
-					
-					// Thực hiện cập nhật giá trị trên View
-					$('#deliveryValue').text('$' + deliveryFee.toFixed(2));
-					$('#discountValue').text('$' + discount.toFixed(2));
-		            $('#totalValue').text('$' + total.toFixed(2));
-				}
-			});
-		});
-	</script> *@
-}

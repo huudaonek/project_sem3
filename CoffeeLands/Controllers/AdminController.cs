@@ -42,35 +42,25 @@ namespace CoffeeLands.Controllers
 
         public async Task<IActionResult> OrderDetails(
     string sortOrder,
-
     int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["PriceSortParm"] = String.IsNullOrEmpty(sortOrder) ? "price_desc" : "";
-
-
-            var orderProducts = from op in _context.OrderDetail
+            ViewData["OrderSortParm"] = String.IsNullOrEmpty(sortOrder) ? "order_desc" : "";
+            var orderDetails = from op in _context.OrderDetail
                 .Include(o => o.OrderProduct)
                 .Include(p => p.Product)
-                select op;
-
+                               select op;
             switch (sortOrder)
             {
-                case "price_desc":
-                    orderProducts = orderProducts.OrderByDescending(s => s.Price);
+                case "order_desc":
+                    orderDetails = orderDetails.OrderByDescending(s => s.OrderProductID);
                     break;
                 default:
-                    orderProducts = orderProducts.OrderBy(s => s.Price);
+                    orderDetails = orderDetails.OrderBy(s => s.OrderProductID);
                     break;
             }
-
             int pageSize = 10;
-            
-            return View("~/Views/Admin/Pages/OrderDetail.cshtml", await PaginatedList<OrderDetail>.CreateAsync(orderProducts.AsNoTracking(), pageNumber ?? 1, pageSize));
+            return View("~/Views/Admin/Pages/OrderDetail.cshtml", await PaginatedList<OrderDetail>.CreateAsync(orderDetails.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
-
-
-
-
     }
 }

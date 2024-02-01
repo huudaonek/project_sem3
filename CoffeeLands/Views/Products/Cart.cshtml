@@ -22,13 +22,7 @@
         </div>
     </div>
 </section>
-@* @{
-    if (ViewBag.Cart != null)
-    {
-        <h1 style="color: red">@ViewBag.Cart</h1>
-    }
 
-} *@
 @{
     if (ViewBag.Cart != null && ((List<ProductCart>)ViewBag.Cart).Any())
     {
@@ -59,7 +53,6 @@
 
                                             <td class="product-name">
                                                 <h3>@Html.DisplayFor(modelItem => item.CartProduct.Name)</h3>
-                                                @* <h3>@Html.DisplayFor(modelItem => item.CartProduct.Id)</h3> *@
                                                 <p style="color: #616162">@Html.DisplayFor(modelItem => item.CartProduct.Description)</p>
                                             </td>
 
@@ -78,10 +71,7 @@
                                                 subtotal += total;
                                             }
                                         </tr>
-
-                                        <!-- END TR-->
                                     }
-
                                 </tbody>
                             </table>
                         </div>
@@ -119,12 +109,8 @@
                             </div>
                             <p class="text-center">
                                 <a asp-area="" asp-controller="Orders" asp-action="Checkout"
-                                   
                                    class="btn btn-primary py-3 px-4">Proceed to Checkout</a>
-                                
-
                             </p>
-                       
                     </div>
                 </div>
             </div>
@@ -192,45 +178,3 @@
         </div>
     </div>
 </section>
-
-@section Scripts{
-    // <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-    // <script>
-    //     $(document).ready(function () {
-    //         // Sự kiện thay đổi số lượng
-    //         $('.quantity').on('change', function () {
-    //             updateCartItem($(this));
-    //         });
-
-    //         // Hàm cập nhật giá trị sản phẩm và tổng cộng
-    //         function updateCartItem(quantityInput) {
-    //             var row = quantityInput.closest('tr');
-    //             var price = parseFloat(row.find('.price').text().replace('$', ''));
-    //             var quantity = parseInt(quantityInput.val(), 10);
-    //             var total = price * quantity;
-
-    //             // Cập nhật giá trị tổng cho sản phẩm cụ thể
-    //             row.find('.total').text('$' + total.toFixed(2));
-
-    //             // Cập nhật tổng số lượng và tổng cộng
-    //             updateCartTotal();
-    //         }
-
-    //         // Hàm cập nhật tổng cộng của giỏ hàng
-    //         function updateCartTotal() {
-    //             var subtotal = 0;
-    //             $('.total').each(function () {
-    //                 subtotal += parseFloat($(this).text().replace('$', ''));
-    //             });
-
-    //             // Cập nhật giá trị subtotal trên giao diện
-    //             $('.cart-subtotal').text('$' + subtotal.toFixed(2));
-
-    //             // Cập nhật giá trị grandtotal trên giao diện (có thể thêm giảm giá nếu cần)
-    //              // Thay thế giảm giá thực của bạn
-    //             var grandTotal = subtotal - discount;
-    //             $('.cart-grandtotal').text('$' + grandTotal.toFixed(2));
-    //         }
-    //     });
-    // </script>
-}

@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using CoffeeLands.Data;
 using CoffeeLands.Models;
 using Microsoft.AspNetCore.Http;
-//using Newtonsoft.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
@@ -29,7 +28,7 @@ namespace CoffeeLands.Controllers
             _hostingEnvironment = hostingEnvironment;
         }
 
-        // GET: Products
+        // Index Products
         public async Task<IActionResult> Index(
     string sortOrder,
     string currentFilter,
@@ -67,8 +66,27 @@ namespace CoffeeLands.Controllers
                     break;
             }
 
-            int pageSize = 3;
+            int pageSize = 10;
             return View(await PaginatedList<Product>.CreateAsync(products.AsNoTracking(), pageNumber ?? 1, pageSize));
+        }
+
+        //Product Detail Admin
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Product
+                .Include(p => p.Category)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
         }
 
         //Product Detail Customer
@@ -95,8 +113,7 @@ namespace CoffeeLands.Controllers
             return View(product);
         }
 
-        //Add To Cart
-
+        #region Cart
         public async Task<IActionResult> AddToCart(int? id, int buy_qty)
         {
             var userID = HttpContext.Session.GetInt32("UserId");
@@ -120,14 +137,6 @@ namespace CoffeeLands.Controllers
 
                 if (product != null && user != null)
                 {
-                    //string productList = JsonConvert.SerializeObject(products);
-                    //HttpContext.Session.SetString("Cart", productList);
-
-                    //string userCart = JsonConvert.SerializeObject(user);
-                    //HttpContext.Session.SetString("userCart", userCart);
-
-                    //HttpContext.Session.SetInt32("buyQty", buy_qty);
-
                     ProductCart pdc = new ProductCart();
                     pdc.Qty = buy_qty;
                     pdc.CartProduct = new Product
@@ -173,10 +182,7 @@ namespace CoffeeLands.Controllers
             }
             return View("~/Views/Test/ProductDetail.cshtml");
         }
-
-
-        //Cart
-        
+           
         public async Task<IActionResult> Cart()
         {
             var checkUser = HttpContext.Session.GetString("UserSession");
@@ -189,28 +195,6 @@ namespace CoffeeLands.Controllers
                 ViewBag.MySession = checkUser.ToString();
             }
             ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
-
-            //List<Product> products = new List<Product>();
-            //string productString = HttpContext.Session.GetString("Cart");
-            //products = JsonConvert.DeserializeObject<List<Product>>(productString);
-
-            //User user = new User();
-            //string userString = HttpContext.Session.GetString("userCart");
-            //user = JsonConvert.DeserializeObject<User>(productString);
-
-            //var buyQty = HttpContext.Session.GetInt32("buyQty");
-            //if (buyQty != null)
-            //{
-
-            //    ProductCart productCart = new ProductCart();
-            //    productCart.Products = products;
-            //    productCart.CartUser = user;
-            //    productCart.UerID = user.Id;
-            //    productCart.Qty = buyQty.Value;
-
-            //    return View("~/Views/Products/Cart.cshtml", productCart);
-            //}
-
 
             var productListJson = HttpContext.Session.GetString("Cart");
             //ViewBag.Cart = HttpContext.Session.GetString("Cart");
@@ -256,37 +240,15 @@ namespace CoffeeLands.Controllers
             }
             return RedirectToAction("Cart", "Products");
         }
-        
-        
-        // GET: Products/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        #endregion
 
-            var product = await _context.Product
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        // GET: Products/Create
+        #region Create Product
         public IActionResult Create()
         {
             PopulateCategoriesDropDownList();
             return View();
         }
 
-        // POST: Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Image,Price,Description,CategoryID")] Product product, List<IFormFile> files)
@@ -321,7 +283,6 @@ namespace CoffeeLands.Controllers
                     }
                 }
             }
-
             try
             {
                 if (true)
@@ -337,17 +298,16 @@ namespace CoffeeLands.Controllers
             }
             catch (DbUpdateException /* ex */)
             {
-                //Log the error (uncomment ex variable name and write a log.
                 ModelState.AddModelError("", "Unable to save changes. " +
                     "Try again, and if the problem persists " +
                     "see your system administrator.");
             }
             PopulateCategoriesDropDownList(product.CategoryID);
-            //ViewData["CategoryID"] = new SelectList(_context.Category, "Id", "Name", product.CategoryID);
             return View(product);
         }
+        #endregion
 
-        // GET: Products/Edit/5
+        #region Edit Product
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -366,9 +326,6 @@ namespace CoffeeLands.Controllers
             return View(product);
         }
 
-        // POST: Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditPost(int? id, List<IFormFile> files)
@@ -418,11 +375,6 @@ namespace CoffeeLands.Controllers
                     productToUpdate.Image = "/customer/images/uploads/" + Path.GetFileName(filePaths[0]);
                 }
             }
-            
-
-
-            
-            
 
             if (await TryUpdateModelAsync<Product>(productToUpdate,
                 "",
@@ -445,7 +397,7 @@ namespace CoffeeLands.Controllers
             PopulateCategoriesDropDownList(productToUpdate.CategoryID);
             return View(productToUpdate);
         }
-
+        #endregion
         private void PopulateCategoriesDropDownList(object selectedCategory = null)
         {
             var categoriesQuery = from d in _context.Category
@@ -454,7 +406,7 @@ namespace CoffeeLands.Controllers
             ViewBag.CategoryID = new SelectList(categoriesQuery.AsNoTracking(), "Id", "Name", selectedCategory);
         }
 
-        // GET: Products/Delete/5
+        #region Delete Product
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -474,7 +426,6 @@ namespace CoffeeLands.Controllers
             return View(product);
         }
 
-        // POST: Products/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -488,7 +439,7 @@ namespace CoffeeLands.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+        #endregion
         private bool ProductExists(int id)
         {
             return _context.Product.Any(e => e.Id == id);

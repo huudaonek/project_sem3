@@ -19,12 +19,8 @@ namespace CoffeeLands.Controllers
             _context = context;
         }
 
-        // GET: Categories
-        public async Task<IActionResult> Index(
-    string sortOrder,
-    string currentFilter,
-    string searchString,
-    int? pageNumber)
+        // Index Categories
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -41,7 +37,7 @@ namespace CoffeeLands.Controllers
             ViewData["CurrentFilter"] = searchString;
 
             var categories = from c in _context.Category
-                         select c;
+                             select c;
             if (!String.IsNullOrEmpty(searchString))
             {
                 categories = categories.Where(s => s.Name.Contains(searchString));

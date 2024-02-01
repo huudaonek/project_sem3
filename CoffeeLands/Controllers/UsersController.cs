@@ -18,19 +18,15 @@ namespace CoffeeLands.Controllers
     public class UsersController : Controller
     {
         private readonly CoffeeLandsContext _context;
-        
+
         public UsersController(CoffeeLandsContext context)
         {
             _context = context;
-           
+
         }
 
-        // GET: Users
-        public async Task<IActionResult> Index(
-    string sortOrder,
-    string currentFilter,
-    string searchString,
-    int? pageNumber)
+        // Index Users
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -66,7 +62,7 @@ namespace CoffeeLands.Controllers
             return View(await PaginatedList<User>.CreateAsync(users.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
 
-        // GET: Users/Details/5
+        //Detail User
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -84,20 +80,39 @@ namespace CoffeeLands.Controllers
             return View(user);
         }
 
-        // GET: Users/Create
+        #region Register
         public IActionResult Register()
         {
             return View("~/Views/Home/Account/Register.cshtml");
         }
-		#region Login
-		public IActionResult Login(string? ReturnUrl)
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Name,Email,Password")] User user)
+        {
+            try
+            {
+                if (true)
+                {
+                    _context.Add(user);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Login", "Users");
+                }
+            }
+            catch (DbUpdateException /* ex */)
+            {
+                //Log the error (uncomment ex variable name and write a log.
+                ModelState.AddModelError("", "Unable to save changes. " +
+                    "Try again, and if the problem persists " +
+                    "see your system administrator.");
+            }
+            return View("~/Views/Home/Account/Register.cshtml", user);
+        }
+        #endregion
+        #region Login
+        public IActionResult Login(string? ReturnUrl)
         {
             ViewBag.ReturnUrl = ReturnUrl;
-
-            //if (HttpContext.Session.GetString("UserSession") != null)
-            //{
-            //    return RedirectToAction("Index", "Home");
-            //}
             return View("~/Views/Home/Account/Login.cshtml");
         }
         [HttpPost]
@@ -157,8 +172,6 @@ namespace CoffeeLands.Controllers
             //             }
             //         }
 
-
-
             ViewBag.ReturnUrl = ReturnUrl;
             if (true)
             {
@@ -180,19 +193,17 @@ namespace CoffeeLands.Controllers
                         if (myUser.Role == "ADMIN")
                         {
                             HttpContext.Session.SetString("Admin", myUser.Name);
-                        }                     
-                            return Redirect("/");
+                        }
+                        return Redirect("/");
                     }
                 }
             }
             return View("~/Views/Home/Account/Login.cshtml");
         }
-        #endregion
-        
-		public async Task<IActionResult> Logout()
+
+        public async Task<IActionResult> Logout()
         {
             //await HttpContext.SignOutAsync();
-
             if (HttpContext.Session.GetString("UserSession") != null)
             {
                 HttpContext.Session.Remove("UserSession");
@@ -200,36 +211,9 @@ namespace CoffeeLands.Controllers
             }
             return Redirect("/");
         }
+        #endregion
 
-
-
-        // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Email,Password")] User user)
-        {
-            try
-            {
-                if (true)
-            {
-                _context.Add(user); 
-                await _context.SaveChangesAsync();
-                    return RedirectToAction("Login", "Users");
-                }
-            }
-            catch (DbUpdateException /* ex */)
-            {
-                //Log the error (uncomment ex variable name and write a log.
-                ModelState.AddModelError("", "Unable to save changes. " +
-                    "Try again, and if the problem persists " +
-                    "see your system administrator.");
-            }
-            return View("~/Views/Home/Account/Register.cshtml", user);
-        }
-
-        // GET: Users/Edit/5
+        #region Edit User
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -245,9 +229,6 @@ namespace CoffeeLands.Controllers
             return View(user);
         }
 
-        // POST: Users/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Email,Password,Role")] User user)
@@ -279,8 +260,8 @@ namespace CoffeeLands.Controllers
             }
             return View(user);
         }
-
-        // GET: Users/Delete/5
+        #endregion
+        #region Delete User
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -298,7 +279,6 @@ namespace CoffeeLands.Controllers
             return View(user);
         }
 
-        // POST: Users/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -312,7 +292,7 @@ namespace CoffeeLands.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
+        #endregion
         private bool UserExists(int id)
         {
             return _context.User.Any(e => e.Id == id);
