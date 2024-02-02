@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Cryptography;
 using PayPal.Api;
 using Microsoft.Extensions.Configuration;
+using CoffeeLands.Services;
 
 
 namespace CoffeeLands.Controllers
@@ -21,19 +22,23 @@ namespace CoffeeLands.Controllers
         private readonly CoffeeLandsContext _context;
         private IHttpContextAccessor _contextAccessor;
         IConfiguration _configuration;
-        public OrdersController(CoffeeLandsContext context, IHttpContextAccessor contextAccessor, IConfiguration iconfiguration)
+        private IVNPayService _vnPayService;
+
+        public OrdersController(CoffeeLandsContext context, IHttpContextAccessor contextAccessor, IConfiguration iconfiguration, IVNPayService vnPayService)
         {
             _context = context;
             _contextAccessor = contextAccessor;
             _configuration = iconfiguration;
+            _vnPayService = vnPayService;
         }
 
         // Index Orders
         public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-
+            ViewData["IDSortParm"] = String.IsNullOrEmpty(sortOrder) ? "id_desc" : "";
+            ViewData["NameSortParm"] = sortOrder == "name_asc" ? "name_asc" : "name_desc";
+            
             if (searchString != null)
             {
                 pageNumber = 1;
@@ -54,11 +59,17 @@ namespace CoffeeLands.Controllers
             }
             switch (sortOrder)
             {
+                case "id_desc":
+                    orders = orders.OrderByDescending(s => s.Id);
+                    break;
+                case "name_asc":
+                    orders = orders.OrderBy(s => s.Name);
+                    break;
                 case "name_desc":
                     orders = orders.OrderByDescending(s => s.Name);
                     break;
                 default:
-                    orders = orders.OrderBy(s => s.Name);
+                    orders = orders.OrderBy(s => s.Id);
                     break;
             }
 
@@ -95,7 +106,7 @@ namespace CoffeeLands.Controllers
                 }
                 ViewBag.TotalProduct = totalProduct;
                 ViewBag.Subtotal = subtotal;
-                ViewBag.GrandTotal = subtotal * 1.1m;
+                ViewBag.GrandTotal = Math.Round(subtotal * 1.10m, 2);
             }
             return View();
         }
@@ -126,9 +137,9 @@ namespace CoffeeLands.Controllers
                             order.Shipping_method = "Free Ship";
                         }
 
-                        if (payment_method == "bank")
+                        if (payment_method == "vnpay")
                         {
-                            order.Payment_method = "Banking";
+                            order.Payment_method = "VnPay";
                         }
                         else if (payment_method == "paypal")
                         {
@@ -138,9 +149,9 @@ namespace CoffeeLands.Controllers
                         {
                             order.Payment_method = "Momo";
                         }
-                        else if (payment_method == "paymentOnDelivery")
+                        else if (payment_method == "COD")
                         {
-                            order.Payment_method = "Payment_On_Delivery";
+                            order.Payment_method = "COD";
                         }
 
                         order.UserID = user.Id;
@@ -169,21 +180,39 @@ namespace CoffeeLands.Controllers
                             _context.AddRange(orderDetails);
                             await _context.SaveChangesAsync();
 
+                            var orderID = order.Id;
+                            HttpContext.Session.SetInt32("OrderID", orderID);
                             ViewBag.OrderProductList = orderDetails;
 
                             if (order.Payment_method == "Paypal")
                             {
-                                var orderID = order.Id;
-                                HttpContext.Session.SetInt32("OrderID", orderID);
-
+                                
+                                var grandTotalll = order.Grand_total.ToString();
+                                HttpContext.Session.SetString("GrandTotalOrder", grandTotalll);
+                                ViewBag.GranTotall = grandTotalll;
                                 return RedirectToAction("PaymentWithPaypal");
                             }
+
+                            if (order.Payment_method == "VnPay")
+                            {
+                                var vnPayModel = new VnPaymentRequestModel
+                                {
+                                    Amount = (double)order.Grand_total,
+                                    CreatedDate = DateTime.Now,
+                                    Description = $"{order.Name} {order.Tel}",
+                                    FullName = order.Name,
+                                    OrderId = new Random().Next(1000, 10000)
+                                };
+
+                                return Redirect(_vnPayService.CreatePaymentUrl(HttpContext, vnPayModel));
+                            }
+
                             productList.Clear();
                             string updatedProductListJson = JsonConvert.SerializeObject(productList);
                             HttpContext.Session.SetString("Cart", updatedProductListJson);
                             HttpContext.Session.SetString("CartNumber", productList.Count.ToString());
 
-                            if (order.Payment_method == "Payment_On_Delivery")
+                            if (order.Payment_method == "COD")
                             {
                                 ViewBag.MySession = checkUser.ToString();
                                 ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
@@ -365,8 +394,11 @@ namespace CoffeeLands.Controllers
         private Payment CreatePayment(APIContext apiContext, string redirectUrl, string blogId)
         {
             var cart = HttpContext.Session.GetString("Cart");
+            var grandTotal = HttpContext.Session.GetString("GrandTotalOrder");
+            
             var orderPaypal = JsonConvert.DeserializeObject<List<ProductCart>>(cart);
-            decimal grandTotal = 0;
+            decimal subTotal = 0;
+            //decimal grandTotal = 0;
             var itemList = new ItemList()
             {
                 items = new List<Item>()
@@ -374,7 +406,7 @@ namespace CoffeeLands.Controllers
             foreach (var item in orderPaypal)
             {
                 var price = item.CartProduct.Price * item.Qty;
-                grandTotal += price;
+                subTotal += price;
                 itemList.items.Add(new Item()
                 {
                     name = item.CartProduct.Name,
@@ -383,8 +415,8 @@ namespace CoffeeLands.Controllers
                     quantity = item.Qty.ToString(),
                     sku = "asd"
                 });
-
             }
+            
             var payer = new PayPal.Api.Payer()
             {
                 payment_method = "paypal"
@@ -405,7 +437,7 @@ namespace CoffeeLands.Controllers
             var amount = new PayPal.Api.Amount()
             {
                 currency = "USD",
-                total = grandTotal.ToString("0.00")
+                total = subTotal.ToString()
             };
             var transactionList = new List<Transaction>();
             transactionList.Add(new Transaction()
@@ -435,6 +467,60 @@ namespace CoffeeLands.Controllers
             return View();
         }
         #endregion
+
+        #region Payment VNPay
+        public async Task<IActionResult> PaymentCallBack()
+        {
+            var response = _vnPayService.PaymentExcute(Request.Query);
+
+            var orderID = HttpContext.Session.GetInt32("OrderID");
+            var productListJson = HttpContext.Session.GetString("Cart");
+            var orderUpdate = await _context.OrderProduct
+                .Include(o => o.User)
+                .Include(od => od.OrderDetails)
+                .ThenInclude(p => p.Product)
+                 .FirstOrDefaultAsync(m => m.Id == orderID);
+
+            if (orderUpdate != null)
+            {
+                if (response == null || response.VnPayResponseCode != "00")
+                {
+                    TempData["Message"] = $"Lỗi thanh toán vnpay: {response.VnPayResponseCode}";
+                    if (productListJson != null)
+                    {
+                        var productList = JsonConvert.DeserializeObject<List<ProductCart>>(productListJson);
+                        productList.Clear();
+                        string updatedProductListJson = JsonConvert.SerializeObject(productList);
+                        HttpContext.Session.SetString("Cart", updatedProductListJson);
+                        HttpContext.Session.SetString("CartNumber", productList.Count.ToString());
+                        HttpContext.Session.Remove("OrderID");
+                        ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
+                    }
+                    return View("~/Views/Orders/Thankyou.cshtml", orderUpdate);
+                    //return RedirectToAction("Fail");
+                }
+
+                TempData["Message"] = $"Thanh toán VNPay thành công";
+                orderUpdate.Is_paid = true;
+                orderUpdate.Status = OrderStatus.CONFIRMED;
+                _context.Update(orderUpdate);
+                await _context.SaveChangesAsync();
+                if (productListJson != null)
+                {
+                    var productList = JsonConvert.DeserializeObject<List<ProductCart>>(productListJson);
+                    productList.Clear();
+                    string updatedProductListJson = JsonConvert.SerializeObject(productList);
+                    HttpContext.Session.SetString("Cart", updatedProductListJson);
+                    HttpContext.Session.SetString("CartNumber", productList.Count.ToString());
+                    HttpContext.Session.Remove("OrderID");
+                    ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
+                }
+                return View("~/Views/Orders/Thankyou.cshtml", orderUpdate);
+            }
+            return View("~/Views/Orders/Checkout.cshtml");
+        }
+        #endregion
+
 
         public async Task<IActionResult> Details(int? id)
         {

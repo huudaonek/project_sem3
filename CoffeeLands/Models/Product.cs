@@ -21,7 +21,6 @@ namespace CoffeeLands.Models
 
         public int CategoryID { get; set; }
         public Category Category { get; set; }
-        //public ProductCart? ProductCart { get; set; }
         public ICollection<ProductCart>? ProductCarts { get; set; }
         public ICollection<OrderDetail>? OrderDetails { get; set; }
 

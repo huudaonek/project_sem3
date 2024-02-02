@@ -5,6 +5,7 @@ using CoffeeLands.Data;
 using CoffeeLands.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Newtonsoft.Json;
+using CoffeeLands.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CoffeeLandsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CoffeeLandsContext") ?? throw new InvalidOperationException("Connection string 'CoffeeLandsContext' not found.")));
@@ -33,6 +34,7 @@ builder.Services.AddHttpContextAccessor();
 //    options.AccessDeniedPath = "/Users/AccessDenied";
 //});
 
+builder.Services.AddSingleton<IVNPayService, VNPayService>();
 
 var app = builder.Build();
 

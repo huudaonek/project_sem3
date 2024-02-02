@@ -14,12 +14,3 @@ namespace CoffeeLands.Models
                
     }
 }
-
-
-//[Key]
-//public int ProductID { get; set; }
-//public int UerID { get; set; }
-//public Product CartProduct { get; set; }
-//public User UserProduct { get; set; }
-//[RegularExpression(@"^[1-9][0-9]*$"), Required, StringLength(10)]
-//public int Qty { get; set; }

@@ -14,7 +14,6 @@ namespace CoffeeLands.Models
 		public string Password { get; set; }
 		[StringLength(30)]
 		public string? Role { get; set; }
-		//public ProductCart? ProductCart { get; set; }
 		public ICollection<OrderProduct>? OrderProducts { get; set; }
 		public ICollection<ProductCart>? ProductCarts { get; set; }
 	}
