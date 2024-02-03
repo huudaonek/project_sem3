@@ -1,0 +1,31 @@
+﻿@model CoffeeLands.Models.OrderProduct
+@{
+    ViewData["Title"] = "Create";
+    Layout = null;
+}
+
+<style>
+    .pay {
+        text-decoration: none;
+    }
+</style>
+
+<div>
+    <form asp-action="RepaymentPost" asp-controller="Orders" method="post">
+<h4>Select a payment method:</h4>
+        <input type="hidden" asp-for="Id" />
+<div class="radio">
+    <label><input type="radio" name="payment_method" value="vnpay" class="mr-2"> VNPay</label>
+</div>
+<div class="radio">
+    <label><input type="radio" name="payment_method" value="momo" class="mr-2"> Momo</label>
+</div>
+<div class="radio">
+    <label><input type="radio" name="payment_method" value="paypal" class="mr-2"> Paypal</label>
+</div>
+<div class="radio">
+    <label><input type="radio" name="payment_method" value="COD" class="mr-2"> COD</label>
+</div>
+<button type="submit" class="btn btn-primary py-3 px-4" style="background-color: #c49b63;color: #000 !important; margin-bottom: 20px;">Pay</button>
+    </form>
+</div>

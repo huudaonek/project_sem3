@@ -15,6 +15,7 @@ using Microsoft.Extensions.Configuration;
 using CoffeeLands.Services;
 
 
+
 namespace CoffeeLands.Controllers
 {
     public class OrdersController : Controller
@@ -23,13 +24,14 @@ namespace CoffeeLands.Controllers
         private IHttpContextAccessor _contextAccessor;
         IConfiguration _configuration;
         private IVNPayService _vnPayService;
-
-        public OrdersController(CoffeeLandsContext context, IHttpContextAccessor contextAccessor, IConfiguration iconfiguration, IVNPayService vnPayService)
+        private readonly IMailService mailService;
+        public OrdersController(CoffeeLandsContext context, IHttpContextAccessor contextAccessor, IConfiguration iconfiguration, IVNPayService vnPayService, IMailService mailService)
         {
             _context = context;
             _contextAccessor = contextAccessor;
             _configuration = iconfiguration;
             _vnPayService = vnPayService;
+            this.mailService = mailService;
         }
 
         // Index Orders
@@ -116,6 +118,7 @@ namespace CoffeeLands.Controllers
         public async Task<IActionResult> PlaceOrder([Bind("Name,Email,Tel,Address,Status,Grand_total,Shipping_method,Payment_method,UserID")] OrderProduct order, decimal grandTotal, string shipping_method, string payment_method)
         {
             var checkUser = HttpContext.Session.GetString("UserSession");
+            ViewBag.MySession = checkUser.ToString();
             var user = await _context.User
                 .Include(pc => pc.ProductCarts)
                 .FirstOrDefaultAsync(m => m.Name == checkUser);
@@ -174,7 +177,7 @@ namespace CoffeeLands.Controllers
                                     Qty = cart.Qty,
                                     Price = cart.CartProduct.Price * cart.Qty
                                 };
-                                //_context.Add(orderDetail);
+                                
                                 orderDetails.Add(orderDetail);
                             }
                             _context.AddRange(orderDetails);
@@ -183,10 +186,14 @@ namespace CoffeeLands.Controllers
                             var orderID = order.Id;
                             HttpContext.Session.SetInt32("OrderID", orderID);
                             ViewBag.OrderProductList = orderDetails;
+                            var data = new ThankYouRequest
+                            {
+                                ToEmail = order.Email,
+                                UserName = order.Name
+                            };
 
                             if (order.Payment_method == "Paypal")
-                            {
-                                
+                            {                              
                                 var grandTotalll = order.Grand_total.ToString();
                                 HttpContext.Session.SetString("GrandTotalOrder", grandTotalll);
                                 ViewBag.GranTotall = grandTotalll;
@@ -214,16 +221,20 @@ namespace CoffeeLands.Controllers
 
                             if (order.Payment_method == "COD")
                             {
-                                ViewBag.MySession = checkUser.ToString();
+                                
                                 ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
                                 var orderSuccess = await _context.OrderProduct
                                     .Include(o => o.User)
                                     .Include(od => od.OrderDetails)
                                     .ThenInclude(p => p.Product)
                                     .FirstOrDefaultAsync(m => m.Id == order.Id);
+
+                                await mailService.SendThankYouEmailAsync(data);
+
                                 return View("~/Views/Orders/Thankyou.cshtml", orderSuccess);
 
                             }
+                            await mailService.SendThankYouEmailAsync(data);
                             return View("~/Views/Orders/Payment.cshtml", order);
                         }
                     }
@@ -278,22 +289,127 @@ namespace CoffeeLands.Controllers
             }
             return View("~/Views/Orders/Payment.cshtml");
         }
+
+        public async Task<IActionResult> Repayment(int? id)
+        {
+            var orderRepayment = await _context.OrderProduct
+               .Include(o => o.User)
+               .Include(od => od.OrderDetails)
+               .ThenInclude(p => p.Product)
+               .FirstOrDefaultAsync(m => m.Id == id);
+            return View("~/Views/Orders/Repayment.cshtml", orderRepayment);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RepaymentPost(int? id, string payment_method)
+        {
+            var orderUpdate = await _context.OrderProduct
+               .Include(o => o.User)
+               .Include(od => od.OrderDetails)
+               .ThenInclude(p => p.Product)
+               .FirstOrDefaultAsync(m => m.Id == id);
+            if(orderUpdate != null)
+            {
+            if (true)
+            {
+                try
+                {
+                        if (payment_method == "vnpay")
+                        {
+                            orderUpdate.Payment_method = "VnPay";
+                        }
+                        else if (payment_method == "paypal")
+                        {
+                            orderUpdate.Payment_method = "Paypal";
+                        }
+                        else if (payment_method == "momo")
+                        {
+                            orderUpdate.Payment_method = "Momo";
+                        }
+                        else if (payment_method == "COD")
+                        {
+                            orderUpdate.Payment_method = "COD";
+                        }
+
+                        _context.Update(orderUpdate);
+                        await _context.SaveChangesAsync();
+
+                        var orderID = orderUpdate.Id;
+                            HttpContext.Session.SetInt32("OrderID", orderID);
+                            
+                            var data = new ThankYouRequest
+                            {
+                                ToEmail = orderUpdate.Email,
+                                UserName = orderUpdate.Name
+                            };
+
+                            if (orderUpdate.Payment_method == "Paypal")
+                            {
+                                var grandTotalll = orderUpdate.Grand_total.ToString();
+                                HttpContext.Session.SetString("GrandTotalOrder", grandTotalll);
+                                ViewBag.GranTotall = grandTotalll;
+                                return RedirectToAction("PaymentWithPaypal");
+                            }
+
+                            if (orderUpdate.Payment_method == "VnPay")
+                            {
+                                var vnPayModel = new VnPaymentRequestModel
+                                {
+                                    Amount = (double)orderUpdate.Grand_total,
+                                    CreatedDate = DateTime.Now,
+                                    Description = $"{orderUpdate.Name} {orderUpdate.Tel}",
+                                    FullName = orderUpdate.Name,
+                                    OrderId = new Random().Next(1000, 10000)
+                                };
+
+                                return Redirect(_vnPayService.CreatePaymentUrl(HttpContext, vnPayModel));
+                            }
+
+                            if (orderUpdate.Payment_method == "COD")
+                            {
+                                ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
+                                var orderSuccess = await _context.OrderProduct
+                                    .Include(o => o.User)
+                                    .Include(od => od.OrderDetails)
+                                .ThenInclude(p => p.Product)
+                                    .FirstOrDefaultAsync(m => m.Id == orderUpdate.Id);
+
+                                await mailService.SendThankYouEmailAsync(data);
+
+                                return View("~/Views/Orders/Thankyou.cshtml", orderSuccess);
+
+                            }
+
+
+                        return View("~/Views/Orders/Payment.cshtml", orderUpdate);
+                    }
+                catch (DbUpdateException /* ex */)
+                {
+                    //Log the error (uncomment ex variable name and write a log.)
+                    ModelState.AddModelError("", "Unable to save changes. " +
+                        "Try again, and if the problem persists, " +
+                        "see your system administrator.");
+                }
+            }
+            }
+            return View("~/Views/Orders/Repayment.cshtml");
+        }
         #endregion
 
         #region paypal
         public async Task<IActionResult> PaymentWithPaypal(string Cancel = null, string blogId = "", string PayerID = "", string guid = "")
         {
+            ViewBag.MySession = HttpContext.Session.GetString("UserSession");
             var orderID = HttpContext.Session.GetInt32("OrderID");
-            //ViewBag.OrderId = orderID;
-            var checkUser = HttpContext.Session.GetString("UserSession");
-            if (string.IsNullOrEmpty(checkUser))
-            {
-                return RedirectToAction("Login", "Users");
-            }
-            else
-            {
-                ViewBag.MySession = checkUser.ToString();
-            }
+            //var checkUser = HttpContext.Session.GetString("UserSession");
+            //if (string.IsNullOrEmpty(checkUser))
+            //{
+            //    return RedirectToAction("Login", "Users");
+            //}
+            //else
+            //{
+            //    ViewBag.MySession = checkUser.ToString();
+            //}
             var productListJson = HttpContext.Session.GetString("Cart");
 
             var orderUpdate = await _context.OrderProduct
@@ -343,9 +459,10 @@ namespace CoffeeLands.Controllers
                                 string updatedProductListJson = JsonConvert.SerializeObject(productList);
                                 HttpContext.Session.SetString("Cart", updatedProductListJson);
                                 HttpContext.Session.SetString("CartNumber", productList.Count.ToString());
-                                HttpContext.Session.Remove("OrderID");
-                                ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
                             }
+                            HttpContext.Session.Remove("OrderID");
+                            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
+                            ViewBag.Result = "false";
                             return View("~/Views/Orders/Thankyou.cshtml", orderUpdate);
                         }
                         var blogIds = executePayment.transactions[0].item_list.items[0].sku;
@@ -361,9 +478,15 @@ namespace CoffeeLands.Controllers
                             string updatedProductListJson = JsonConvert.SerializeObject(productList);
                             HttpContext.Session.SetString("Cart", updatedProductListJson);
                             HttpContext.Session.SetString("CartNumber", productList.Count.ToString());
-                            HttpContext.Session.Remove("OrderID");
-                            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
                         }
+                        HttpContext.Session.Remove("OrderID");
+                        ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
+                        var data = new ThankYouRequest
+                        {
+                            ToEmail = orderUpdate.Email,
+                            UserName = orderUpdate.Name
+                        };
+                        await mailService.SendThankYouEmailAsync(data);
                         return View("~/Views/Orders/Thankyou.cshtml", orderUpdate);
                     }
                 }
@@ -372,6 +495,7 @@ namespace CoffeeLands.Controllers
                     return View("~/Views/Orders/Fail.cshtml");
                 }
             }
+
             return View("~/Views/Orders/Fail.cshtml");
         }
 
@@ -472,6 +596,8 @@ namespace CoffeeLands.Controllers
         public async Task<IActionResult> PaymentCallBack()
         {
             var response = _vnPayService.PaymentExcute(Request.Query);
+            ViewBag.MySession = HttpContext.Session.GetString("UserSession");
+            //ViewBag.MySession = checkUser.ToString();      
 
             var orderID = HttpContext.Session.GetInt32("OrderID");
             var productListJson = HttpContext.Session.GetString("Cart");
@@ -493,9 +619,10 @@ namespace CoffeeLands.Controllers
                         string updatedProductListJson = JsonConvert.SerializeObject(productList);
                         HttpContext.Session.SetString("Cart", updatedProductListJson);
                         HttpContext.Session.SetString("CartNumber", productList.Count.ToString());
-                        HttpContext.Session.Remove("OrderID");
-                        ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
                     }
+                    HttpContext.Session.Remove("OrderID");
+                    ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
+                    ViewBag.Result = "false";
                     return View("~/Views/Orders/Thankyou.cshtml", orderUpdate);
                     //return RedirectToAction("Fail");
                 }
@@ -512,15 +639,20 @@ namespace CoffeeLands.Controllers
                     string updatedProductListJson = JsonConvert.SerializeObject(productList);
                     HttpContext.Session.SetString("Cart", updatedProductListJson);
                     HttpContext.Session.SetString("CartNumber", productList.Count.ToString());
-                    HttpContext.Session.Remove("OrderID");
-                    ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
                 }
+                HttpContext.Session.Remove("OrderID");
+                ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
+                var data = new ThankYouRequest
+                {
+                    ToEmail = orderUpdate.Email,
+                    UserName = orderUpdate.Name
+                };
+                await mailService.SendThankYouEmailAsync(data);
                 return View("~/Views/Orders/Thankyou.cshtml", orderUpdate);
             }
             return View("~/Views/Orders/Checkout.cshtml");
         }
         #endregion
-
 
         public async Task<IActionResult> Details(int? id)
         {

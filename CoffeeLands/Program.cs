@@ -6,6 +6,7 @@ using CoffeeLands.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Newtonsoft.Json;
 using CoffeeLands.Services;
+using System.Configuration;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CoffeeLandsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CoffeeLandsContext") ?? throw new InvalidOperationException("Connection string 'CoffeeLandsContext' not found.")));
@@ -35,6 +36,9 @@ builder.Services.AddHttpContextAccessor();
 //});
 
 builder.Services.AddSingleton<IVNPayService, VNPayService>();
+
+builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
+builder.Services.AddTransient<IMailService, MailService>();
 
 var app = builder.Build();
 
