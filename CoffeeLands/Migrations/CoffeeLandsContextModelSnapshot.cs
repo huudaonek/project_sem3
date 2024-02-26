@@ -16,7 +16,7 @@ namespace CoffeeLands.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "8.0.2")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -54,7 +54,6 @@ namespace CoffeeLands.Migrations
                         .HasColumnType("decimal(18, 2)");
 
                     b.Property<int>("Qty")
-                        .HasMaxLength(10)
                         .HasColumnType("int");
 
                     b.HasKey("OrderProductID", "ProductID");
@@ -74,8 +73,8 @@ namespace CoffeeLands.Migrations
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -132,8 +131,7 @@ namespace CoffeeLands.Migrations
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Image")
                         .IsRequired()
@@ -141,8 +139,8 @@ namespace CoffeeLands.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18, 2)");
@@ -157,30 +155,6 @@ namespace CoffeeLands.Migrations
                     b.ToTable("Product", (string)null);
                 });
 
-            modelBuilder.Entity("CoffeeLands.Models.ProductCart", b =>
-                {
-                    b.Property<int>("UerID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ProductID")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CartUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Qty")
-                        .HasMaxLength(10)
-                        .HasColumnType("int");
-
-                    b.HasKey("UerID", "ProductID");
-
-                    b.HasIndex("CartUserId");
-
-                    b.HasIndex("ProductID");
-
-                    b.ToTable("ProductCart", (string)null);
-                });
-
             modelBuilder.Entity("CoffeeLands.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -191,8 +165,11 @@ namespace CoffeeLands.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("Is_active")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -201,12 +178,11 @@ namespace CoffeeLands.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Role")
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -260,25 +236,6 @@ namespace CoffeeLands.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("CoffeeLands.Models.ProductCart", b =>
-                {
-                    b.HasOne("CoffeeLands.Models.User", "CartUser")
-                        .WithMany("ProductCarts")
-                        .HasForeignKey("CartUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CoffeeLands.Models.Product", "CartProduct")
-                        .WithMany("ProductCarts")
-                        .HasForeignKey("ProductID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CartProduct");
-
-                    b.Navigation("CartUser");
-                });
-
             modelBuilder.Entity("CoffeeLands.Models.Category", b =>
                 {
                     b.Navigation("Products");
@@ -292,15 +249,11 @@ namespace CoffeeLands.Migrations
             modelBuilder.Entity("CoffeeLands.Models.Product", b =>
                 {
                     b.Navigation("OrderDetails");
-
-                    b.Navigation("ProductCarts");
                 });
 
             modelBuilder.Entity("CoffeeLands.Models.User", b =>
                 {
                     b.Navigation("OrderProducts");
-
-                    b.Navigation("ProductCarts");
                 });
 #pragma warning restore 612, 618
         }

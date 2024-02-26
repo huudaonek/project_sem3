@@ -1,4 +1,4 @@
-using CoffeeLands.Data;
+﻿using CoffeeLands.Data;
 using CoffeeLands.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,73 +23,53 @@ namespace CoffeeLands.Controllers
 		}
 
         public IActionResult Index()
-        {
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                ViewBag.MySession = HttpContext.Session.GetString("UserSession").ToString();
-            }
-                ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
+        {             
             return View("~/Views/Home/Pages/Index.cshtml");
         }
 
         public async Task<IActionResult> Menu()
         {
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                ViewBag.MySession = HttpContext.Session.GetString("UserSession").ToString();
-            }
             var products = await _coffeeContext.Product.Take(4).ToListAsync();
-            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
             return View("~/Views/Home/Pages/Menu.cshtml", products);
         }
 
         public IActionResult Services()
         {
-
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                ViewBag.MySession = HttpContext.Session.GetString("UserSession").ToString();
-            }
-            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
             return View("~/Views/Home/Pages/Services.cshtml");
         }
 
         public IActionResult Blog()
         {
-
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                ViewBag.MySession = HttpContext.Session.GetString("UserSession").ToString();
-            }
-            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
             return View("~/Views/Home/Pages/Blog.cshtml");
         }
 
         public IActionResult About()
         {
-
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                ViewBag.MySession = HttpContext.Session.GetString("UserSession").ToString();
-            }
-            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
             return View("~/Views/Home/Pages/About.cshtml");
         }
 
         public IActionResult Contact()
         {
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                ViewBag.MySession = HttpContext.Session.GetString("UserSession").ToString();
-            }
-            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
             return View("~/Views/Home/Pages/Contact.cshtml");
         }
         public IActionResult Privacy()
         {
             return View("~/Views/Home/Pages/Privacy.cshtml");
         }
-        
+        public async Task<IActionResult> Verify(string email)
+        {
+            var accounts = await _coffeeContext.User
+                .SingleOrDefaultAsync(a => a.Email == email);
+            if (accounts != null)
+            {
+                accounts.Is_active = true;
+                _coffeeContext.Update(accounts);
+                await _coffeeContext.SaveChangesAsync();
+                return View("~/Views/Home/Account/Verify.cshtml");
+            }
+            return View("~/Views/Home/Account/Verify.cshtml");
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

@@ -7,6 +7,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Newtonsoft.Json;
 using CoffeeLands.Services;
 using System.Configuration;
+using CoffeeLands.ViewModels.Mail;
+using CoffeeLands.ViewModels.Momo;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CoffeeLandsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CoffeeLandsContext") ?? throw new InvalidOperationException("Connection string 'CoffeeLandsContext' not found.")));
@@ -28,17 +30,21 @@ builder.Services.AddDbContext<CoffeeLandsContext>(item => item.UseSqlServer(conf
 builder.Services.AddRazorPages();
 builder.Services.AddHttpContextAccessor();
 
-//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
-//    options =>
-//{
-//    options.LoginPath = "/Users/Login";
-//    options.AccessDeniedPath = "/Users/AccessDenied";
-//});
-
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+    options =>
+{
+    options.LoginPath = "/Users/Login";
+    options.AccessDeniedPath = "/Users/AccessDenied";
+});
+//builder.Services.AddScoped<IPayPalService, PayPalService>();
 builder.Services.AddSingleton<IVNPayService, VNPayService>();
 
 builder.Services.Configure<MailSettings>(builder.Configuration.GetSection("MailSettings"));
 builder.Services.AddTransient<IMailService, MailService>();
+
+
+builder.Services.Configure<MomoOptionModel>(builder.Configuration.GetSection("MomoAPI"));
+builder.Services.AddScoped<IMomoService, MomoService>();
 
 var app = builder.Build();
 
@@ -66,7 +72,7 @@ app.UseSession();
 
 app.UseRouting();
 
-//app.UseAuthentication();
+app.UseAuthentication();
 
 app.UseAuthorization();
 

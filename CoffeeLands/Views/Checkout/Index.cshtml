@@ -28,7 +28,7 @@
 
 <section class="ftco-section">
 	<div class="container">
-		<form asp-area="" asp-controller="Orders" asp-action="PlaceOrder" class="billing-form ftco-bg-dark p-3 p-md-5" method="post">
+		<form asp-area="" asp-controller="Checkout" asp-action="PlaceOrder" class="billing-form ftco-bg-dark p-3 p-md-5" method="post">
 		<div class="row">
 			<div class="col-xl-8 ftco-animate">
 				<div class="billing-form ftco-bg-dark p-3 p-md-5" >
@@ -71,16 +71,17 @@
 						<div class="checkout__input__checkbox">
 							<label for="shippingmethod">Shipping Method</label> </br>
 							<label for="acc">
-								<input name="shipping_method" value = "express" type = "radio" id = "acc" >
+									<input asp-for="Shipping_method" value="Express" type="radio" id="acc">
 								Express
 								<span class="checkmark"></span>
 								</label>
 								<br />
 								<label for="free">
-									<input name="shipping_method"  value = "free_shipping" type = "radio" id = "free" >
+									<input asp-for="Shipping_method" value="Free_shipping" type="radio" id="free">
 								Free Shipping
 								<span class="checkmark"></span>
 							</label>
+								<span asp-validation-for="Shipping_method" class="text-danger"></span>
 						</div>
 					</div>
 				</div><!-- END -->
@@ -92,7 +93,7 @@
 						<h3 class="billing-heading mb-4">Cart Total</h3>
 						<p class="d-flex p-cart">
 							<span>Subtotal</span>
-								<span>$@ViewBag.Subtotal</span>
+								<span>$@ViewBag.Total</span>
 						</p>
 						<p class="d-flex p-cart">
 							<span>Delivery</span>
@@ -106,48 +107,43 @@
 						<p class="d-flex total-price p-cart">
 							<span>Total</span>
 							<span id="totalValue">$@ViewBag.GrandTotal</span>
-								<input type="hidden" name="grandTotal" value="@ViewBag.GrandTotal" />
+								<input type="hidden" asp-for="Grand_total" value="@ViewBag.GrandTotal" />
 						</p>
 					</div>
 				</div>
 				<div >
 					<div class="cart-detail ftco-bg-dark p-3 p-md-4">
 						<h3 class="billing-heading mb-4">Payment Method</h3>
-						<div class="form-group">
-							<div class="col-md-12">
-								<div class="radio">
-										<label><input type="radio" name="payment_method" value="vnpay" class="mr-2"> VNPay</label>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-md-12">
-								<div class="radio">
-									<label><input type="radio" name="payment_method" value="momo" class="mr-2"> Momo</label>
-								</div>
-							</div>
-						</div>
-						<div class="form-group">
-							<div class="col-md-12">
-								<div class="radio">
-									<label><input type="radio" name="payment_method" value="paypal" class="mr-2"> Paypal</label>
-								</div>
-							</div>
-						</div>
 							<div class="form-group">
 								<div class="col-md-12">
 									<div class="radio">
-										<label><input type="radio" name="payment_method" value="COD" class="mr-2"> COD</label>
+										<label><input type="radio" asp-for="Payment_method" value="Paypal" class="mr-2"> Paypal</label>
 									</div>
 								</div>
 							</div>
 						<div class="form-group">
 							<div class="col-md-12">
-								<div class="checkbox">
-									<label><input type="checkbox" value="" class="mr-2"> I have read and accept the terms and conditions</label>
+								<div class="radio">
+										<label><input type="radio" asp-for="Payment_method" value="VnPay" class="mr-2"> VNPay</label>
 								</div>
 							</div>
 						</div>
+						@* <div class="form-group">
+							<div class="col-md-12">
+								<div class="radio">
+									<label><input type="radio" name="payment_method" value="momo" class="mr-2"> Momo</label>
+								</div>
+							</div>
+						</div> *@
+							<div class="form-group">
+								<div class="col-md-12">
+									<div class="radio">
+										<label><input type="radio" asp-for="Payment_method" value="COD" class="mr-2"> COD</label>
+									</div>
+								</div>
+							</div>
+							<span asp-validation-for="Payment_method" class="text-danger"></span>
+
 							<button type="submit" class="btn btn-primary py-3 px-4" style="background-color: #c49b63;color: #000 !important; margin-bottom: 20px;">Place an order</button>
 					</div>
 				</div>

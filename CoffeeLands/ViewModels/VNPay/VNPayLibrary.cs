@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Security.Policy;
 using System.Text;
 
-namespace CoffeeLands.Models
+namespace CoffeeLands.ViewModels.VNPay
 {
     public class VnPayLibrary
     {

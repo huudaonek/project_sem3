@@ -1,9 +1,6 @@
-﻿@model List<CoffeeLands.Models.ProductCart>
+﻿@model List<CoffeeLands.ViewModels.CartItem>
 @{
     ViewData["Title"] = "Cart";
-    decimal total = 0;
-    decimal subtotal = 0;
-    decimal grandTotal = 0;
 }
 
 <section class="home-slider owl-carousel">
@@ -24,7 +21,7 @@
 </section>
 
 @{
-    if (ViewBag.Cart != null && ((List<ProductCart>)ViewBag.Cart).Any())
+    if (Model.Any())
     {
         // <p>@ViewBag.Cart</p>
         <section class="ftco-section ftco-cart">
@@ -47,33 +44,28 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr class="text-center">
-                                            <td class="product-remove"><a asp-area="" asp-controller="Products" asp-action="RemoveToCart" asp-route-id="@item.CartProduct.Id"><span class="icon-close"></span></a></td>
+                                            <td class="product-remove"><a asp-area="" asp-controller="Cart" asp-action="RemoveToCart" asp-route-productId="@item.ProductID" asp-route-userId="@item.UserID"><span class="icon-close"></span></a></td>
 
-                                            <td class="image-prod"><div class="img" style="background-image:url(@item.CartProduct.Image);"></div></td>
+                                            <td class="image-prod"><div class="img" style="background-image:url(@item.Image);"></div></td>
 
                                             <td class="product-name">
-                                                <h3>@Html.DisplayFor(modelItem => item.CartProduct.Name)</h3>
-                                                <p style="color: #616162">@Html.DisplayFor(modelItem => item.CartProduct.Description)</p>
+                                                <h3>@Html.DisplayFor(modelItem => item.Name)</h3>
+                                                <p style="color: #616162">@Html.DisplayFor(modelItem => item.Description)</p>
                                             </td>
 
-                                            <td class="price">@Html.DisplayFor(modelItem => item.CartProduct.Price)</td>
+                                            <td class="price">@Html.DisplayFor(modelItem => item.Price)</td>
 
                                             <td class="quantity">
                                                 <div class="input-group mb-3">
                                                     <input type="text" name="buy_qty" class="quantity form-control input-number" value="@Html.DisplayFor(modelItem => item.Qty)" min="1" max="100">
                                                 </div>
                                             </td>
-                                            @{
-                                                total = item.CartProduct.Price * item.Qty;
-                                            }
-                                            <td class="total">$@total</td>
-                                            @{
-                                                subtotal += total;
-                                            }
+                                            <td class="total">$@item.SubTotal</td>
                                         </tr>
                                     }
                                 </tbody>
                             </table>
+                            <div><a asp-controller="Home" asp-action="Menu">Countiue Shopping</a></div>
                         </div>
                     </div>
                 </div>
@@ -84,31 +76,20 @@
                                 <h3>Cart Totals</h3>
                                 <p class="d-flex">
                                     <span>Subtotal</span>
-                                <span class="cart-subtotal">$@subtotal</span>
+                                <span class="cart-subtotal">$@ViewBag.Total</span>
                                 </p>
                                 <p class="d-flex">
                                     <span>VAT</span>
                                     <span>10%</span>
                                 </p>
                                 <hr>
-                                @{
-                                    if (subtotal == 0)
-                                    {
-                                        grandTotal = 0;
-                                    }
-                                    else
-                                    {
-                                    grandTotal = Math.Round(subtotal * 1.10m, 2);
-                                    }
-
-                                }
                                 <p class="d-flex total-price">
                                     <span>Total</span>
-                                <span class="cart-grandtotal">$@grandTotal</span>
+                                <span class="cart-grandtotal">$@ViewBag.GrandTotal</span>
                                 </p>
                             </div>
                             <p class="text-center">
-                                <a asp-area="" asp-controller="Orders" asp-action="Checkout"
+                            <a asp-area="" asp-controller="Checkout" asp-action="Index"
                                    class="btn btn-primary py-3 px-4">Proceed to Checkout</a>
                             </p>
                     </div>

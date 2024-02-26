@@ -30,9 +30,10 @@ namespace CoffeeLands.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true)
+                    Email = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Is_active = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
                 },
                 constraints: table =>
                 {
@@ -45,10 +46,10 @@ namespace CoffeeLands.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Image = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CategoryID = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -71,7 +72,7 @@ namespace CoffeeLands.Migrations
                     Name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     Tel = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Grand_total = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Shipping_method = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Payment_method = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -91,38 +92,12 @@ namespace CoffeeLands.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductCart",
-                columns: table => new
-                {
-                    ProductID = table.Column<int>(type: "int", nullable: false),
-                    UerID = table.Column<int>(type: "int", nullable: false),
-                    Qty = table.Column<int>(type: "int", maxLength: 10, nullable: false),
-                    CartUserId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductCart", x => new { x.UerID, x.ProductID });
-                    table.ForeignKey(
-                        name: "FK_ProductCart_Product_ProductID",
-                        column: x => x.ProductID,
-                        principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductCart_User_CartUserId",
-                        column: x => x.CartUserId,
-                        principalTable: "User",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "OrderDetail",
                 columns: table => new
                 {
                     OrderProductID = table.Column<int>(type: "int", nullable: false),
                     ProductID = table.Column<int>(type: "int", nullable: false),
-                    Qty = table.Column<int>(type: "int", maxLength: 10, nullable: false),
+                    Qty = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
@@ -170,16 +145,6 @@ namespace CoffeeLands.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductCart_CartUserId",
-                table: "ProductCart",
-                column: "CartUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductCart_ProductID",
-                table: "ProductCart",
-                column: "ProductID");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_User_Email",
                 table: "User",
                 column: "Email",
@@ -197,9 +162,6 @@ namespace CoffeeLands.Migrations
         {
             migrationBuilder.DropTable(
                 name: "OrderDetail");
-
-            migrationBuilder.DropTable(
-                name: "ProductCart");
 
             migrationBuilder.DropTable(
                 name: "OrderProduct");

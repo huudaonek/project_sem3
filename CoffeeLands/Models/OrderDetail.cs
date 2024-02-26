@@ -10,7 +10,6 @@ namespace CoffeeLands.Models
 	{
 		public int OrderProductID { get; set; }
 		public int ProductID { get; set; }
-		[RegularExpression(@"^[1-9][0-9]*$"), Required, StringLength(10)]
 		public int Qty { get; set; }
 		[DataType(DataType.Currency)]
 		[Column(TypeName = "decimal(18, 2)")]

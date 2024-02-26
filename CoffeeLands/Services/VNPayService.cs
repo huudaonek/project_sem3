@@ -1,4 +1,4 @@
-﻿using CoffeeLands.Models;
+﻿using CoffeeLands.ViewModels.VNPay;
 
 namespace CoffeeLands.Services
 {

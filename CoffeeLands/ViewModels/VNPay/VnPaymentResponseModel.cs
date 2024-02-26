@@ -1,4 +1,4 @@
-﻿namespace CoffeeLands.Models
+﻿namespace CoffeeLands.ViewModels.VNPay
 {
     public class VnPaymentResponseModel
     {

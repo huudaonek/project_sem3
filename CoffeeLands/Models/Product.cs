@@ -9,19 +9,18 @@ namespace CoffeeLands.Models
     {
         public int Id { get; set; }
         
-        [RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
+        [RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(100)]
         public string Name { get; set; }
        
         public string Image { get; set; }
         [DataType(DataType.Currency)]
         [Column(TypeName = "decimal(18, 2)")]
         public decimal Price { get; set; }
-        [RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(100)]
+        [RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required]
         public string? Description { get; set; }
 
         public int CategoryID { get; set; }
         public Category Category { get; set; }
-        public ICollection<ProductCart>? ProductCarts { get; set; }
         public ICollection<OrderDetail>? OrderDetails { get; set; }
 
     }

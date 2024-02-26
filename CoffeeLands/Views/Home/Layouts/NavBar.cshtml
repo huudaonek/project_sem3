@@ -21,33 +21,10 @@
                     </div>
                 </li>
                 <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link">Contact</a></li>
-                <li class="nav-item cart"><a asp-area="" asp-controller="Products" asp-action="Cart" class="nav-link"><span class="icon icon-shopping_cart"></span><span class="bag d-flex justify-content-center align-items-center">
-                            @if (ViewBag.CartNumber != null)
-                                {
-                                <small>
-                                    @ViewBag.CartNumber
-                                </small>
-                                }else{
-                                <small>
-                                    0
-                                </small>
-                                }
-                </span></a></li>
-
-                @* @if (ViewBag.IsAuthenticated != null && (bool)ViewBag.IsAuthenticated)
+                @await Component.InvokeAsync("Cart")
+                @if (User.Identity.IsAuthenticated)
                 {
-                    <li class="nav-item"><a href="javascript:void(0);" class="nav-link">@ViewBag.MySession</a></li>
-                    <li class="nav-item"><a asp-area="" asp-controller="Users" asp-action="Logout" class="nav-link">Logout</a></li>
-                }
-                else
-                {
-                    <li class="nav-item"><a asp-area="" asp-controller="Users" asp-action="Login" class="nav-link">Login  </a></li>
-                    <li class="nav-item"><a asp-area="" asp-controller="Users" asp-action="Register" class="nav-link">Register</a></li>
-                } *@
-
-                @if (ViewBag.MySession != null)
-                {
-                    <li class="nav-item"><a href="javascript:void(0);" class="nav-link">@ViewBag.MySession</a></li>
+                    <li class="nav-item"><a href="javascript:void(0);" class="nav-link">@User.Identity.Name</a></li>
                     <li class="nav-item"><a asp-area="" asp-controller="Users" asp-action="Logout" class="nav-link">Logout</a></li>
                 }
                 else
@@ -55,7 +32,6 @@
                     <li class="nav-item"><a asp-area="" asp-controller="Users" asp-action="Login" class="nav-link">Login  </a></li>
                     <li class="nav-item"><a asp-area="" asp-controller="Users" asp-action="Register" class="nav-link">Register</a></li>
                 }
-
             </ul>
         </div>
     </div>

@@ -18,7 +18,6 @@ namespace CoffeeLands.Data
         public DbSet<CoffeeLands.Models.User> User { get; set; } = default!;
         public DbSet<CoffeeLands.Models.Category> Category { get; set; } = default!;
         public DbSet<CoffeeLands.Models.Product> Product { get; set; } = default!;
-        public DbSet<CoffeeLands.Models.ProductCart> ProductCart { get; set; } = default!;
         public DbSet<CoffeeLands.Models.OrderProduct> OrderProduct { get; set; } = default!;
 		public DbSet<CoffeeLands.Models.OrderDetail> OrderDetail { get; set; } = default!;
 
@@ -41,8 +40,6 @@ namespace CoffeeLands.Data
                 .HasIndex(p => p.Name).IsUnique();
             modelBuilder.Entity<Product>().ToTable("Product")
                 .HasIndex(p => p.Name).IsUnique();
-            modelBuilder.Entity<ProductCart>().ToTable("ProductCart")
-                .HasKey(pc => new { pc.UerID, pc.ProductID });
             modelBuilder.Entity<OrderProduct>().ToTable("OrderProduct");
             modelBuilder.Entity<OrderDetail>().ToTable("OrderDetail")
                 .HasKey(op => new { op.OrderProductID, op.ProductID });

@@ -7,16 +7,17 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CoffeeLands.Data;
 using CoffeeLands.Models;
+using CoffeeLands.ViewModels;
 using Microsoft.AspNetCore.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
+using CoffeeLands.Helpers;
 
 namespace CoffeeLands.Controllers
 {
-
     public class ProductsController : Controller
     {
         private readonly CoffeeLandsContext _context;
@@ -27,13 +28,10 @@ namespace CoffeeLands.Controllers
             _context = context;
             _hostingEnvironment = hostingEnvironment;
         }
+        public List<CartItem> MyCart => HttpContext.Session.Get<List<CartItem>>("Cart") ?? new List<CartItem>();
 
         // Index Products
-        public async Task<IActionResult> Index(
-    string sortOrder,
-    string currentFilter,
-    string searchString,
-    int? pageNumber)
+        public async Task<IActionResult> Index(string sortOrder, string currentFilter, string searchString, int? pageNumber)
         {
             ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
@@ -46,9 +44,7 @@ namespace CoffeeLands.Controllers
             {
                 searchString = currentFilter;
             }
-
             ViewData["CurrentFilter"] = searchString;
-
             var products = from s in _context.Product
                            .Include(c => c.Category)
                            select s;
@@ -97,12 +93,6 @@ namespace CoffeeLands.Controllers
                 return NotFound();
             }
 
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                ViewBag.MySession = HttpContext.Session.GetString("UserSession").ToString();
-            }
-            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
-
             var product = await _context.Product
                 .Include(p => p.Category)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -113,134 +103,7 @@ namespace CoffeeLands.Controllers
             return View(product);
         }
 
-        #region Cart
-        public async Task<IActionResult> AddToCart(int? id, int buy_qty)
-        {
-            var userID = HttpContext.Session.GetInt32("UserId");
-            var checkUser = HttpContext.Session.GetString("UserSession");
-            if (string.IsNullOrEmpty(checkUser))
-            {
-                return RedirectToAction("Login", "Users");
-            }
-            if (id == null)
-            {
-                //ViewBag.Cart = "Add To Cart Failed!";
-                return RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                var product = await _context.Product
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(p => p.Id == id);
-                var user = await _context.User
-                .FirstOrDefaultAsync(u => u.Id == userID);
-
-                if (product != null && user != null)
-                {
-                    ProductCart pdc = new ProductCart();
-                    pdc.Qty = buy_qty;
-                    pdc.CartProduct = new Product
-                    {
-                        Id = product.Id,
-                        Name = product.Name,
-                        Image = product.Image,
-                        Price = product.Price,
-                        Description = product.Description
-                    };
-                    pdc.CartUser = new User
-                    {
-                        Id = user.Id,
-                        Name = user.Name,
-                        Email = user.Email,
-                        Password = user.Password,
-                        Role = user.Role,
-                    };
-                    //await _context.SaveChangesAsync();
-
-                    // Lưu đối tượng vào Session
-                    var productListJson = HttpContext.Session.GetString("Cart");
-                    var productList = new List<ProductCart>();
-                    if (!string.IsNullOrEmpty(productListJson))
-                    {
-                        // Nếu Session đã chứa danh sách, thì deserialize nó và thêm mới
-                        productList = JsonConvert.DeserializeObject<List<ProductCart>>(productListJson);
-                    }
-                    ProductCart existingProductCart = productList.FirstOrDefault(p => p.CartProduct.Id == product.Id && p.CartUser.Id == user.Id);
-                    if (existingProductCart != null)
-                    {
-                        existingProductCart.Qty += buy_qty;
-                    }
-                    else
-                    {
-                        productList.Add(pdc);
-                    }
-                    string updatedProductListJson = JsonConvert.SerializeObject(productList);
-                    HttpContext.Session.SetString("Cart", updatedProductListJson);
-                    HttpContext.Session.SetString("CartNumber", productList.Count.ToString());
-                    return RedirectToAction("Cart", "Products");
-                }
-            }
-            return View("~/Views/Test/ProductDetail.cshtml");
-        }
-           
-        public async Task<IActionResult> Cart()
-        {
-            var checkUser = HttpContext.Session.GetString("UserSession");
-            if (string.IsNullOrEmpty(checkUser))
-            {
-                return RedirectToAction("Login", "Users");
-            }
-            else
-            {
-                ViewBag.MySession = checkUser.ToString();
-            }
-            ViewBag.CartNumber = HttpContext.Session.GetString("CartNumber");
-
-            var productListJson = HttpContext.Session.GetString("Cart");
-            //ViewBag.Cart = HttpContext.Session.GetString("Cart");
-            if (!string.IsNullOrEmpty(productListJson))
-            {
-                decimal totalProduct = 0;
-                decimal subtotal = 0;
-                var productList = JsonConvert.DeserializeObject<List<ProductCart>>(productListJson);
-                ViewBag.Cart = productList;
-                foreach (ProductCart productCart in productList )
-                {
-                    totalProduct = productCart.Qty * productCart.CartProduct.Price;
-                    subtotal += totalProduct;
-                }
-                ViewBag.TotalProduct = totalProduct;
-                ViewBag.Subtotal = subtotal;
-
-                return View(productList);
-
-            }
-            return View(new List<ProductCart>());
-        }
-        public async Task<IActionResult> RemoveToCart(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            var productListJson = HttpContext.Session.GetString("Cart");
-            if (!string.IsNullOrEmpty(productListJson))
-            {
-                var productList = JsonConvert.DeserializeObject<List<ProductCart>>(productListJson);
-                var productToRemove = productList.FirstOrDefault(p => p.CartProduct.Id == id);
-
-                if (productToRemove != null)
-                {
-                    productList.Remove(productToRemove);
-                    // Cập nhật Session với danh sách đã cập nhật
-                    string updatedProductListJson = JsonConvert.SerializeObject(productList);
-                    HttpContext.Session.SetString("Cart", updatedProductListJson);
-                    HttpContext.Session.SetString("CartNumber", productList.Count.ToString());
-                }
-            }
-            return RedirectToAction("Cart", "Products");
-        }
-        #endregion
+        
 
         #region Create Product
         public IActionResult Create()

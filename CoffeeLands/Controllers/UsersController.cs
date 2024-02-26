@@ -8,21 +8,27 @@ using Microsoft.EntityFrameworkCore;
 using CoffeeLands.Data;
 using CoffeeLands.Models;
 using Newtonsoft.Json;
+using System.Security.Cryptography;
+using System.Text;
+using CoffeeLands.Services;
+using CoffeeLands.ViewModels.Mail;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+
 
 namespace CoffeeLands.Controllers
 {
     public class UsersController : Controller
     {
         private readonly CoffeeLandsContext _context;
+        private readonly IMailService _mailService;
 
-        public UsersController(CoffeeLandsContext context)
+        public UsersController(CoffeeLandsContext context, IMailService mailService)
         {
             _context = context;
-
+            _mailService = mailService;
         }
 
         // Index Users
@@ -80,6 +86,94 @@ namespace CoffeeLands.Controllers
             return View(user);
         }
 
+
+        #region update
+        //public IActionResult Register()
+        //{
+        //    return View("~/Views/Home/Account/Register.cshtml");
+        //}
+        //public IActionResult Login()
+        //{
+        //    if (HttpContext.Session.GetString("UserSession") != null)
+        //    {
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    return View("~/Views/Home/Account/Login.cshtml");
+        //}
+        //[HttpPost]
+        //public async Task<IActionResult> Login(User model)
+        //{
+        //    var user = await _context.User.FirstOrDefaultAsync(u => u.Email == model.Email);
+
+        //    if (user != null && VerifyPassword(model.Password, user.Password))
+        //    {
+        //        HttpContext.Session.SetString("UserSession", JsonConvert.SerializeObject(user));
+        //        ViewBag.MySession = user.Name;
+        //        HttpContext.Session.SetInt32("UserId", user.Id);
+        //        if (user.Role == "ADMIN")
+        //        {
+        //            HttpContext.Session.SetString("Admin", user.Name);
+        //        }
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    else
+        //    {
+        //        ModelState.AddModelError(string.Empty, "Invalid email or password");
+        //        return View("~/Views/Home/Account/Login.cshtml");
+        //    }
+        //}
+
+        //// Hàm xác minh mật khẩu
+        //private bool VerifyPassword(string inputPassword, string hashedPassword)
+        //{
+        //    string hashedInputPassword = HashPassword(inputPassword);
+
+        //    return hashedInputPassword == hashedPassword;
+        //}
+
+
+        //public IActionResult Logout()
+        //{
+        //    if (HttpContext.Session.GetString("UserSession") != null)
+        //    {
+        //        HttpContext.Session.Remove("UserSession");
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    return View("~/Views/Home/Pages/Index.cshtml");
+        //}
+
+
+
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("Name,Email,Password,Role")] User user)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        user.Password = HashPassword(user.Password);
+        //        user.Role = "USER";
+        //        _context.User.Add(user);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    return View(user);
+        //}
+        //private string HashPassword(string password)
+        //{
+        //    using (SHA256 sha256Hash = SHA256.Create())
+        //    {
+        //        byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+        //        // Chuyển đổi mảng byte thành chuỗi và chọn một phần của chuỗi để sử dụng
+        //        string hashedPassword = BitConverter.ToString(bytes).Replace("-", "").Substring(0, 29);
+
+        //        return hashedPassword;
+        //    }
+        //}
+        #endregion
+
+
         #region Register
         public IActionResult Register()
         {
@@ -94,8 +188,18 @@ namespace CoffeeLands.Controllers
             {
                 if (true)
                 {
+                    user.Role = "CUSTOMER";
                     _context.Add(user);
                     await _context.SaveChangesAsync();
+
+                    var data = new SendMailRequest
+                    {
+                        ToEmail = user.Email,
+                        UserName = user.Name,
+                        Url = "verify"
+                    };
+                    await _mailService.SendBodyEmailAsync(data);
+
                     return RedirectToAction("Login", "Users");
                 }
             }
@@ -110,6 +214,7 @@ namespace CoffeeLands.Controllers
         }
         #endregion
         #region Login
+        [HttpGet]
         public IActionResult Login(string? ReturnUrl)
         {
             ViewBag.ReturnUrl = ReturnUrl;
@@ -118,60 +223,6 @@ namespace CoffeeLands.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(User user, string? ReturnUrl)
         {
-            //ViewBag.ReturnUrl = ReturnUrl;
-            //         if (true)
-            //         {
-            //             var myUser = _context.User.SingleOrDefault(u => u.Email == user.Email && u.Password == user.Password);
-            //             if(myUser == null)
-            //             {
-            //                 ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-            //             }
-            //             else
-            //             {
-            //                 if(myUser.Email != user.Email || myUser.Password != user.Password)
-            //                 {
-            //                     ModelState.AddModelError("Error!", "Tài khoản hoặc mật khẩu không đúng!");
-            //                 }
-            //                 else
-            //                 {
-            //                     var claims = new List<Claim>
-            //                     {
-            //                         new Claim(ClaimTypes.Email, myUser.Email),
-            //                         new Claim(ClaimTypes.Name, myUser.Name),
-            //                         //new Claim("userID", user.Id)
-
-            //                         new Claim(ClaimTypes.Role, myUser.Role)
-
-            //                     };
-
-            //                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-            //                     var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
-
-            //                     await HttpContext.SignInAsync(claimsPrincipal);
-
-            //                     HttpContext.Session.SetString("UserSession", myUser.Name);
-            //                     HttpContext.Session.SetInt32("UserId", myUser.Id);
-
-
-
-            //                     if (myUser.Role == "ADMIN")
-            //                     {
-            //                         HttpContext.Session.SetString("Admin", myUser.Name);
-            //                     }
-
-            //                     if (Url.IsLocalUrl(ReturnUrl))
-            //                     {
-            //                         return Redirect(ReturnUrl);
-            //                     }
-            //                     else
-            //                     {
-            //                         return Redirect("/");
-            //                     }
-
-            //                 }
-            //             }
-            //         }
-
             ViewBag.ReturnUrl = ReturnUrl;
             if (true)
             {
@@ -185,30 +236,47 @@ namespace CoffeeLands.Controllers
                     if (myUser.Email != user.Email || myUser.Password != user.Password)
                     {
                         ModelState.AddModelError("Error!", "Tài khoản hoặc mật khẩu không đúng!");
+                    } 
+                    else if (myUser.Is_active == false)
+                    {
+                        ModelState.AddModelError("Error!", "Tài khoản của bạn chưa được kích hoạt, vui lòng check lại email để kích hoạt!");
                     }
                     else
                     {
-                        HttpContext.Session.SetString("UserSession", myUser.Name);
-                        HttpContext.Session.SetInt32("UserId", myUser.Id);
-                        if (myUser.Role == "ADMIN")
+                        var claims = new List<Claim>
                         {
-                            HttpContext.Session.SetString("Admin", myUser.Name);
+                            new Claim(ClaimTypes.Email, myUser.Email),
+                            new Claim(ClaimTypes.Name, myUser.Name),
+                            new Claim("CustomerID", myUser.Id.ToString()),
+                            //claim - role động
+                            new Claim(ClaimTypes.Role, myUser.Role)
+
+                        };
+
+                        var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var claimsPrincipal = new ClaimsPrincipal(claimsIdentity);
+
+                        await HttpContext.SignInAsync(claimsPrincipal);
+                        if (Url.IsLocalUrl(ReturnUrl))
+                        {
+                            return Redirect(ReturnUrl);
                         }
-                        return Redirect("/");
+                        else
+                        {
+                            return Redirect("/");
+                        }
+                        
                     }
                 }
             }
             return View("~/Views/Home/Account/Login.cshtml");
         }
-
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
-            //await HttpContext.SignOutAsync();
-            if (HttpContext.Session.GetString("UserSession") != null)
-            {
-                HttpContext.Session.Remove("UserSession");
-                return RedirectToAction("Index", "Home");
-            }
+            await HttpContext.SignOutAsync();
+                
+            
             return Redirect("/");
         }
         #endregion

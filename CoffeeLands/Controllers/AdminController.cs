@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace CoffeeLands.Controllers
 {
@@ -16,18 +17,17 @@ namespace CoffeeLands.Controllers
         {
             _context = context;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            if (HttpContext.Session.GetString("Admin") != null)
+            var checkRole = User.FindFirst(ClaimTypes.Role);
+            if (checkRole.Value == "ADMIN")
             {
-                ViewBag.UserAdmin = HttpContext.Session.GetString("Admin").ToString();
+                return View("~/Views/Admin/Pages/Index.cshtml");
             }
             else
             {
                 return RedirectToAction("Index", "Home");
             }
-
-            return View("~/Views/Admin/Pages/Index.cshtml");
         }
 
         public IActionResult Index2()
