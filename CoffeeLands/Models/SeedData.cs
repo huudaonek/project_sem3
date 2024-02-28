@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using CoffeeLands.Data;
+using CoffeeLands.Helpers;
 using System;
 using System.Linq;
 using Faker;
@@ -25,11 +26,11 @@ public static class SeedData
 
             var users = new User[]
             {
-                new User { Name="Admin", Email="quannhth2210007@fpt.edu.vn", Password="12345",Role="ADMIN", Is_active=true},
-                new User { Name="HuuQuan", Email="quan2004@gmail.com", Password="12345",Role="CUSTOMER", Is_active=true},
-                new User { Name="David", Email="hahaha@gmail.com", Password="12345",Role="CUSTOMER"},
-                new User { Name="Adam", Email="abc@gmail.com", Password="12345",Role="CUSTOMER"},
-                new User { Name="Eva", Email="123@gmail.com", Password="12345",Role="CUSTOMER", Is_active=true},
+                new User { Name="Admin", Email="quannhth2210007@fpt.edu.vn", Password=DataEncryptionExtensions.HashPassword("12345") ,Role="ADMIN", Is_active=true},
+                new User { Name="HuuQuan", Email="quan2004@gmail.com", Password=DataEncryptionExtensions.HashPassword("1234"),Role="CUSTOMER", Is_active=true},
+                new User { Name="David", Email="hahaha@gmail.com", Password=DataEncryptionExtensions.HashPassword("123"),Role="CUSTOMER"},
+                new User { Name="Adam", Email="abc@gmail.com", Password=DataEncryptionExtensions.HashPassword("12"),Role="CUSTOMER"},
+                new User { Name="Eva", Email="123@gmail.com", Password=DataEncryptionExtensions.HashPassword("1"),Role="CUSTOMER", Is_active=true},
             };
             foreach (User u in users)
             {
@@ -55,7 +56,7 @@ public static class SeedData
             var productFaker = new Faker<Product>()
     .RuleFor(p => p.Name, f => f.Commerce.ProductName())
     //.RuleFor(p => p.Name, (f, p) => p.Name.Substring(0, Math.Min(p.Name.Length, 30)))
-    .RuleFor(p => p.Image, f => $"/customer/images/uploads/anh-{f.Random.Number(1, 5)}.jpg")
+    .RuleFor(p => p.Image, f => $"/customer/images/uploads/anh_{f.Random.Number(1, 5)}.jpg")
     .RuleFor(p => p.Price, f => f.Random.Decimal(1, 100))
     .RuleFor(p => p.Description, f => f.Lorem.Sentence())
     .RuleFor(p => p.CategoryID, f => f.PickRandom(categories).Id);
@@ -70,18 +71,4 @@ public static class SeedData
 
         }
     }
-
-    //private static string HashPassword(string password)
-    //{
-    //    using (SHA256 sha256Hash = SHA256.Create())
-    //    {
-    //        byte[] bytes = sha256Hash.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-
-    //        // Chuyển đổi mảng byte thành chuỗi và chọn một phần của chuỗi để sử dụng
-    //        string hashedPassword = BitConverter.ToString(bytes).Replace("-", "").Substring(0, 29);
-
-    //        return hashedPassword;
-    //    }
-    //}
-
 }

@@ -32,7 +32,6 @@
                                     <tr>
                                         <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]" asp-route-currentFilter="@ViewData["CurrentFilter"]" style="color: black">Name</a></th>
                                         <th>Email</th>
-                                        <th>Password</th>
                                         <th></th>
                                     </tr>
                                 </thead>
@@ -45,9 +44,6 @@
                                             </td>
                                             <td>
                                                 @Html.DisplayFor(modelItem => item.Email)
-                                            </td>
-                                            <td>
-                                                @Html.DisplayFor(modelItem => item.Password)
                                             </td>
                                             <td>
                                                 <a asp-action="Details" asp-route-id="@item.Id">Details</a>

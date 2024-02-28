@@ -50,7 +50,7 @@ namespace CoffeeLands.Controllers
                 var user = await _context.User.SingleOrDefaultAsync(u => u.Name == userName);
                 if (product == null)
                 {
-                    TempData["Message"] = $"Không tìm thấy hàng hóa có mã {id}";
+                    TempData["Error"] = $"Không tìm thấy hàng hóa có mã {id}";
                     return Redirect("/ProductDetail");
                 }
                 item = new CartItem
@@ -70,6 +70,7 @@ namespace CoffeeLands.Controllers
                 item.Qty += buy_qty;
             }
             HttpContext.Session.Set("Cart", cart);
+            //TempData["Notification"] = "Add to cart success!";
             return RedirectToAction("Index", "Cart");
         }
 

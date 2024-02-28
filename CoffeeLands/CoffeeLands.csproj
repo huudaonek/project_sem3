@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="wwwroot\customer\images\uploads\" />
   </ItemGroup>
 
 </Project>

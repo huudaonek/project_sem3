@@ -26,7 +26,10 @@ namespace CoffeeLands.Controllers
         {             
             return View("~/Views/Home/Pages/Index.cshtml");
         }
-
+        public IActionResult NotFound()
+        {
+            return View("~/Views/Home/Pages/404.cshtml");
+        }
         public async Task<IActionResult> Menu()
         {
             var products = await _coffeeContext.Product.Take(4).ToListAsync();
@@ -56,6 +59,12 @@ namespace CoffeeLands.Controllers
         {
             return View("~/Views/Home/Pages/Privacy.cshtml");
         }
+
+        public IActionResult VerifyPage()
+        {
+            return View("~/Views/Home/Account/Verify.cshtml");
+        }
+
         public async Task<IActionResult> Verify(string email)
         {
             var accounts = await _coffeeContext.User
@@ -65,7 +74,7 @@ namespace CoffeeLands.Controllers
                 accounts.Is_active = true;
                 _coffeeContext.Update(accounts);
                 await _coffeeContext.SaveChangesAsync();
-                return View("~/Views/Home/Account/Verify.cshtml");
+                return Redirect("VerifyPage");
             }
             return View("~/Views/Home/Account/Verify.cshtml");
         }

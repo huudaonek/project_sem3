@@ -3,24 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using CoffeeLands.Data;
 using CoffeeLands.Models;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Http;
-using System.Security.Cryptography;
-using PayPal.Api;
-using Microsoft.Extensions.Configuration;
-using CoffeeLands.Services;
-using Azure;
-using CoffeeLands.ViewModels.Paypal;
-using CoffeeLands.ViewModels.Mail;
-using CoffeeLands.ViewModels.VNPay;
-using CoffeeLands.ViewModels.Momo;
-using CoffeeLands.Helpers;
-using CoffeeLands.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+
 
 
 

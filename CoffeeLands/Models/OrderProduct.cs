@@ -11,13 +11,13 @@ namespace CoffeeLands.Models
 	public class OrderProduct
 	{
 		public int Id { get; set; }
-		[RegularExpression(@"^[A-Z]+[a-zA-Z\s]*$"), Required, StringLength(30)]
+		[Required, StringLength(30)]
 		public string Name { get; set; }
 		[Required, StringLength(30)]
 		public string Email { get; set; }
 		[RegularExpression(@"^0[0-9]{9}$"), Required, StringLength(10)]
 		public string Tel { get; set; }
-		[RegularExpression(@"^[A-Za-z][a-zA-Z\s]*$"), Required, StringLength(100)]
+		[Required, StringLength(100)]
 		public string Address { get; set; }
 
 		[DataType(DataType.Currency)]

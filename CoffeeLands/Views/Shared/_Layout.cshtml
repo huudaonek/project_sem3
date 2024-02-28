@@ -9,8 +9,11 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    
-    @await Html.PartialAsync("../Home/Layouts/NavBar")
+    @if (ViewBag.ShowNavBar == true)
+    {
+        @await Html.PartialAsync("../Home/Layouts/NavBar")
+
+    }
 
         @RenderBody()
 

@@ -58,6 +58,9 @@ namespace CoffeeLands.Controllers
                 {
                     total += cartItem.SubTotal;
                 }
+                CartTotal cartTotal = new CartTotal();
+                cartTotal.SubTotal = total;
+                cartTotal.GrandTotal = Math.Round(total * 1.1m, 2);
                 ViewBag.Total = total;
                 ViewBag.GrandTotal = Math.Round(total * 1.1m, 2);
             }
@@ -72,13 +75,10 @@ namespace CoffeeLands.Controllers
             var user = await _context.User
                 .FirstOrDefaultAsync(m => m.Name == checkUser);
 
-            if (true)
+			try
+			{
+				if (true)
             {
-                try
-                {
-                    //order.Grand_total = grandTotal;
-                    //order.Shipping_method = shipping_method;
-                    //order.Payment_method = payment_method;
                     order.UserID = user.Id;
                     _context.Add(order);
                     await _context.SaveChangesAsync();
@@ -153,13 +153,13 @@ namespace CoffeeLands.Controllers
                             return Redirect("ThankYou");
                         }
                     }
-                }
-                catch (DbUpdateException)
-                {
-                    ModelState.AddModelError("", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
-                }
             }
-            return View("~/Views/Checkout/Index.cshtml");
+			}
+			catch (DbUpdateException)
+			{
+				ModelState.AddModelError("error", "Unable to save changes. Try again, and if the problem persists see your system administrator.");
+			}
+			return View("~/Views/Checkout/Index.cshtml");
         }
 
         #region paypal
@@ -354,7 +354,7 @@ namespace CoffeeLands.Controllers
                 await mailService.SendBodyEmailAsync(data);
                 return Redirect("ThankYou");
             }
-            return View("~/Views/Checkout/Index.cshtml");
+			return Redirect("Checkout");
         }
         #endregion
 
@@ -363,8 +363,8 @@ namespace CoffeeLands.Controllers
         public IActionResult PaymentCallBackMomo()
         {
             var response = _momoService.PaymentExecuteAsync(HttpContext.Request.Query);
-            return View("~/Views/Checkout/Thankyou.cshtml");
-        }
+			return Redirect("ThankYou");
+		}
         #endregion
 
         [Authorize]

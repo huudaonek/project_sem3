@@ -20,13 +20,16 @@ namespace CoffeeLands.Controllers
         public async Task<IActionResult> Index()
         {
             var checkRole = User.FindFirst(ClaimTypes.Role);
-            if (checkRole.Value == "ADMIN")
+            if (checkRole.Value != "ADMIN")
             {
-                return View("~/Views/Admin/Pages/Index.cshtml");
+                return RedirectToAction("NotFound", "Home");
             }
             else
             {
-                return RedirectToAction("Index", "Home");
+                ViewBag.User = _context.User.Count();
+                ViewBag.Product = _context.Product.Count();
+                ViewBag.Order = _context.OrderProduct.Count();
+                return View("~/Views/Admin/Pages/Index.cshtml");
             }
         }
 

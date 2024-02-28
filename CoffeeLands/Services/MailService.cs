@@ -53,7 +53,7 @@ namespace CoffeeLands.Services
             StreamReader str = new StreamReader(FilePath);
             string MailText = str.ReadToEnd();
             str.Close();
-            MailText = MailText.Replace("[username]", request.UserName).Replace("[email]", request.ToEmail).Replace("verify", $"https://localhost:7102/Home/Verify?email={request.ToEmail}");
+            MailText = MailText.Replace("[username]", request.UserName).Replace("[email]", request.ToEmail).Replace("verify", $"https://localhost:7102/Home/Verify?email={request.ToEmail}").Replace("forgotpwd", $"https://localhost:7102/Users/ResetPassword?email={request.ToEmail}") ;
             var email = new MimeMessage();
             email.Sender = MailboxAddress.Parse(_mailSettings.Mail);
             email.To.Add(MailboxAddress.Parse(request.ToEmail));

@@ -152,7 +152,7 @@ namespace CoffeeLands.Controllers
                 {
                     if (filePaths.Count > 0)
                     {
-                        product.Image = "/customer/images/uploads/" + Path.GetFileName(filePaths[0]);
+                        product.Image = "customer/images/uploads/" + Path.GetFileName(filePaths[0]);
                     }
                     _context.Add(product);
                     await _context.SaveChangesAsync();
@@ -235,7 +235,7 @@ namespace CoffeeLands.Controllers
                             }
                         }
                     }
-                    productToUpdate.Image = "/customer/images/uploads/" + Path.GetFileName(filePaths[0]);
+                    productToUpdate.Image = "customer/images/uploads/" + Path.GetFileName(filePaths[0]);
                 }
             }
 

@@ -17,18 +17,35 @@
     <link rel="stylesheet" href="~/admin/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="~/admin/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body class="hold-transition login-page">
-   
+   <div class="login-box">
     @RenderBody()
-
+    </div>
     <!-- jQuery -->
     <script src="~/admin/plugins/jquery/jquery.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="~/admin/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="~/admin/dist/js/adminlte.min.js"></script>
+    @if (TempData["Notification"] != null || TempData["Error"] != null)
+    {
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+        if (TempData["Notification"] != null)
+        {
+            <script type="text/javascript">
+                toastr.success('@TempData["Notification"]');
+            </script>
+        }
+        if (TempData["Error"] != null)
+        {
+            <script type="text/javascript">
+                toastr.error('@TempData["Error"]');
+            </script>
+        }
+    }
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

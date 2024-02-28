@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Thank You";
+    ViewBag.ShowNavBar = false;
 }
 
 @section Styles {
@@ -15,7 +16,7 @@
 {
     <section class="home-slider owl-carousel">
 
-        <div class="slider-item" style="background-image: url(images/bg_3.jpg);" data-stellar-background-ratio="0.5">
+        <div class="slider-item" style="background-image: url(/customer/images/bg_3.jpg);" data-stellar-background-ratio="0.5">
             <div class="overlay"></div>
             <div class="container">
                 <div class="row slider-text justify-content-center align-items-center">
@@ -39,16 +40,15 @@
                         {
                             <h1 class="text-center">Thank you ^^</h1>
 
-                            <h3 class="text-center">Your Order @Model.Id has been placed</h3>
+                            <h3 class="text-center">Your Order has been placed</h3>
                             <h4>@ViewBag.OrderId</h4>
                             <h4>@ViewBag.OrderIDD</h4>
                             <h3>Danh sách sản phẩm của đơn hàng:</h3>
                             <table class="table">
                                 <thead class="thead-primary">
                                     <tr class="text-center">
-                                        <th>ID</th>
-                                        <th>Image</th>
                                         <th>Name</th>
+                                        <th>Image</th>
                                         <th>Price</th>
                                         <th>Qty</th>
                                         <th>Total</th>
@@ -58,9 +58,8 @@
                                     @foreach (var item in Model.OrderDetails)
                                     {
                                         <tr>
-                                            <td>@item.Product.Id</td>
-                                            <td><img src="@item.Product.Image" alt="img" width="70px" height="70px"></td>
                                             <td>@item.Product.Name</td>
+                                            <td><img src="@item.Product.Image" alt="img" width="70px" height="70px"></td>
                                             <td>@item.Product.Price</td>
                                             <td>@item.Qty</td>
                                             <td>@item.Price</td>
@@ -74,7 +73,10 @@
                         {
                             <a asp-controller="Orders" asp-action="Payment" asp-route-id="@Model.Id" class="btn btn-warning" style="float: right;margin-bottom: 20px;border-radius: 1px;color: white;">Thanh Toán Ngay!</a>
                         } *@
+                            
+                                decimal subtotal = Math.Round(Model.Grand_total / 1.1m, 2);
 
+                            <h5 class="text-right" style="margin-right: 15px;color: #f3f3f3;">SubTotal: $@subtotal</h5>
                             <h6 class="text-right" style="margin-right: 15px;color: #f3f3f3;">VAT: 10%</h6>
                             @if (Model.Is_paid == true)
                             {
