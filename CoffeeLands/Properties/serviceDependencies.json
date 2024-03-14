@@ -2,7 +2,8 @@
   "dependencies": {
     "mssql1": {
       "type": "mssql",
-      "connectionId": "ConnectionStrings:CoffeeLandsContext"
+      "connectionId": "ConnectionStrings:CoffeeLandsContext",
+      "dynamicId": null
     }
   }
 }

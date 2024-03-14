@@ -15,6 +15,8 @@ using Newtonsoft.Json;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authorization;
 using CoffeeLands.Helpers;
+using PayPal.Api;
+using Microsoft.CodeAnalysis;
 
 namespace CoffeeLands.Controllers
 {
@@ -86,6 +88,7 @@ namespace CoffeeLands.Controllers
         }
 
         //Product Detail Customer
+        [HttpGet("ProductDetail/{id}")]
         public async Task<IActionResult> ProductDetail(int? id)
         {
             if (id == null)
@@ -95,7 +98,10 @@ namespace CoffeeLands.Controllers
 
             var product = await _context.Product
                 .Include(p => p.Category)
+                .Include(f => f.Feedbacks)
+                .ThenInclude(u => u.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (product == null)
             {
                 return NotFound();
@@ -103,7 +109,49 @@ namespace CoffeeLands.Controllers
             return View(product);
         }
 
-        
+        //Feedback
+
+        public async Task<IActionResult> Feedback(int? idProduct, int? star)
+        {
+            if (idProduct == null)
+            {
+                return NotFound();
+            }
+
+            var feedbacks = await _context.Feedback
+                                .Include(u => u.User)
+                .Include(p => p.Product)
+                .ThenInclude(c => c.Category)
+                .ToListAsync();
+            List<FeedbackVM> feedbackVMList = new List<FeedbackVM>();
+            
+            foreach (var feedback in feedbacks)
+            {
+                var item = new FeedbackVM
+                {
+                    Id = feedback.Id,
+                    Vote = feedback.Vote,
+                    imagesFeedback = feedback.imagesFeedback,
+                    Description = feedback.Description,
+                    UserName = feedback.User.Name,
+                    UserImage = "~/wwwroot/customer/images/feedbacks/anh-1.jpg",
+                    ProductId = feedback.Product.Id,
+                    ProductName = feedback.Product.Name
+                };
+                feedbackVMList.Add(item);
+            }
+
+            var query = feedbackVMList.Where(f => f.ProductId == idProduct);
+
+            if (star != null && star <= 5)
+            {
+                query = query.Where(f => f.Vote == star);
+            }
+
+            var result = query.ToArray();
+
+            return Ok(result);
+        }
 
         #region Create Product
         public IActionResult Create()

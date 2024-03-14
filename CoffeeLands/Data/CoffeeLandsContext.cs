@@ -21,16 +21,16 @@ namespace CoffeeLands.Data
         public DbSet<CoffeeLands.Models.OrderProduct> OrderProduct { get; set; } = default!;
 		public DbSet<CoffeeLands.Models.OrderDetail> OrderDetail { get; set; } = default!;
 
+        public DbSet<CoffeeLands.Models.Feedback> Feedback { get; set; } = default!;
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    if (!optionsBuilder.IsConfigured)
+        //    {
 
-		//protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-		//{
-		//    if (!optionsBuilder.IsConfigured)
-		//    {
+        //    }
+        //}
 
-		//    }
-		//}
-
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().ToTable("User")
                 .HasIndex(p => p.Name).IsUnique();

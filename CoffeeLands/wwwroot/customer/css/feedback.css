@@ -1,0 +1,52 @@
+﻿.feedback-container {
+    width: 100%;
+    color: #f1f1f1;
+}
+
+.star-rating {
+    width: 90%;
+    height: 100%;
+    margin: auto;
+    display: flex;
+    align-items: center;
+}
+
+.rank {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+    .rank li {
+        list-style-type: none;
+        padding: 3px 33px;
+        border: 1px solid;
+        border-radius: 1px;
+    }
+
+        .rank li:not(:last-child) {
+            margin-right: 8px;
+        }
+
+        .rank li a:hover {
+            color: yellow;
+        }
+
+.comment-container {
+    display: flex;
+    margin-top: 25px;
+}
+
+.comment-img {
+    width: 6%;
+    margin-top: 3px;
+}
+
+    .comment-img img {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+    }
+
+.btn-like i:hover {
+    color: yellow !important;
+}

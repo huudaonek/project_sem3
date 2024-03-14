@@ -9,6 +9,7 @@ using CoffeeLands.Services;
 using System.Configuration;
 using CoffeeLands.ViewModels.Mail;
 using CoffeeLands.ViewModels.Momo;
+using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CoffeeLandsContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("CoffeeLandsContext") ?? throw new InvalidOperationException("Connection string 'CoffeeLandsContext' not found.")));
@@ -20,7 +21,10 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 
 builder.Services.AddMvc().AddSessionStateTempDataProvider();
-
+builder.Services.AddMvc().AddJsonOptions(o =>
+{
+    o.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
+});
 builder.Services.AddSession();
 
 var provider = builder.Services.BuildServiceProvider();

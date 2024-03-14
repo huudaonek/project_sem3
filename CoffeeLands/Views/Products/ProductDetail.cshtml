@@ -2,14 +2,22 @@
 @{
     ViewData["Title"] = "Product";
 }
-@section Styles{
+@section Styles {
     <style>
         .btn .submit-button:hover {
-                background-color: transparent;
-                border: 1px solid #c49b63 !important;
-                color: #c49b63 !important;
+            background-color: transparent;
+            border: 1px solid #c49b63 !important;
+            color: #c49b63 !important;
         }
-    </style>  
+
+        .getVote.active {
+            color: yellow; 
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="~/customer/css/feedback.css"/>
 }
 <section class="home-slider owl-carousel">
 
@@ -42,40 +50,110 @@
                     On her way she met a copy. The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word "and" and the Little Blind Text should turn around and return to its own, safe country. But nothing the copy said could convince her and so it didn’t take long until a few insidious Copy Writers ambushed her, made her drunk with Longe and Parole and dragged her into their agency, where they abused her for their.
                 </p>
                 <form asp-area="" asp-controller="Cart" asp-action="AddToCart" asp-route-id="@Model.Id" method="get">
-                <div class="row mt-4">
-                    <div class="col-md-6">
-                        <div class="form-group d-flex">
-                            <div class="select-wrap">
-                                <div class="icon"><span class="ion-ios-arrow-down"></span></div>
-                                <select name="" id="" class="form-control">
-                                    <option value="">Small</option>
-                                    <option value="">Medium</option>
-                                    <option value="">Large</option>
-                                    <option value="">Extra Large</option>
-                                </select>
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="form-group d-flex">
+                                <div class="select-wrap">
+                                    <div class="icon"><span class="ion-ios-arrow-down"></span></div>
+                                    <select name="" id="" class="form-control">
+                                        <option value="">Small</option>
+                                        <option value="">Medium</option>
+                                        <option value="">Large</option>
+                                        <option value="">Extra Large</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
+                        <div class="w-100"></div>
+                        <div class="input-group col-md-6 d-flex mb-3">
+                            <span class="input-group-btn mr-2">
+                                <button type="button" class="quantity-left-minus btn" data-type="minus" data-field="">
+                                    <i class="icon-minus"></i>
+                                </button>
+                            </span>
+                            <input type="text" id="quantity" name="buy_qty" class="form-control input-number" value="1" min="1" max="100">
+                            <span class="input-group-btn ml-2">
+                                <button type="button" class="quantity-right-plus btn" data-type="plus" data-field="">
+                                    <i class="icon-plus"></i>
+                                </button>
+                            </span>
+                        </div>
                     </div>
-                    <div class="w-100"></div>
-                    <div class="input-group col-md-6 d-flex mb-3">
-                        <span class="input-group-btn mr-2">
-                            <button type="button" class="quantity-left-minus btn" data-type="minus" data-field="">
-                                <i class="icon-minus"></i>
-                            </button>
-                        </span>
-                        <input type="text" id="quantity" name="buy_qty" class="form-control input-number" value="1" min="1" max="100">
-                        <span class="input-group-btn ml-2">
-                            <button type="button" class="quantity-right-plus btn" data-type="plus" data-field="">
-                                <i class="icon-plus"></i>
-                            </button>
-                        </span>
-                    </div>
-                </div>
-                <p>
+                    <p>
                         <button type="submit" class="btn submit-button py-3 px-5" style="background-color: #c49b63;color: #000 !important;">Add to Cart</button>
                     </p>
                 </form>
             </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="container">
+        <div class="feedback-container">
+
+            <div style="border-top: 1px solid #f1f1f1;"></div>
+            <h1>Feedback</h1>
+            <div style="border: 1px solid white;height: 130px">
+                <div class="star-rating">
+                    <div style="width: 12%;">
+                        <span style="color: yellow;"> <label style="font-size: 20px;">4.9</label> / 5.0</span>
+                        <div>
+                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                        </div>
+                    </div>
+                    @{
+                        var vote = 0;
+                        var vote1 = 0;
+                        var vote2 = 0;
+                        var vote3 = 0;
+                        var vote4 = 0;
+                        var vote5 = 0;
+                        foreach (var item in Model.Feedbacks)
+                        {
+                            if (item.Vote == 1)
+                            {
+                                vote1++;
+                            }
+                            else if (item.Vote == 2)
+                            {
+                                vote2++;
+                            }
+                            else if (item.Vote == 3)
+                            {
+                                vote3++;
+                            }
+                            else if (item.Vote == 4)
+                            {
+                                vote4++;
+                            }
+                            else if (item.Vote == 5)
+                            {
+                                vote5++;
+                            }
+                            vote++;
+                        }
+                    }
+                    <div>
+                        <ul class="rank">
+                            <li>
+                                <a class="getVote" href="" data-star="6">All (@vote)</a>
+                            </li>
+                            <li><a class="getVote" href="" data-star="5">5 Star (@vote5)</a></li>
+                            <li><a class="getVote" href="" data-star="4">4 Star (@vote4)</a></li>
+                            <li><a class="getVote" href="" data-star="3">3 Star (@vote3)</a></li>
+                            <li><a class="getVote" href="" data-star="2">2 Star (@vote2)</a></li>
+                            <li><a class="getVote" href="" data-star="1">1 Star (@vote1)</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="feedback-data"></div>
         </div>
     </div>
 </section>
@@ -158,5 +236,152 @@
             });
 
         });
-</script>
+    </script>
+    <script>
+        $(document).ready(function () {
+            $(".getVote").click((event) => {
+                event.preventDefault();
+
+                $(".getVote").removeClass("active");
+                $(event.currentTarget).addClass("active");
+
+                var starValue = event.currentTarget.getAttribute('data-star');
+                // var star = $(event.target).find('span').text().split(" ")[0];
+                console.log(starValue);
+
+                fetch(`/Products/Feedback?idProduct=${@Model.Id}&star=${starValue}`)
+                    .then((response) => {
+                        return response.json();
+                    })
+                    .then((data) => {
+                        console.log(data);
+                        if (data.length === 0) {
+                            var html = (() => {
+                                return `<h3 style="margin-top: 10px">No Feedback</h3>`;
+                            })();
+                            document.getElementById('feedback-data').innerHTML = html;
+                        } else {
+                            var htmls = data.map((feedback) => {
+                                var starsHtml = '';
+                                for (var i = 1; i <= 5; i++) {
+                                    if (i < feedback.vote) {
+                                        starsHtml += '<i class="fa-solid fa-star" style="color: #FFD43B;"></i>';
+                                    } else {
+                                        starsHtml += '<i class="fa-regular fa-star" style="color: #FFD43B;"></i>';
+                                    }
+                                }
+                                return `<div class="comment-container">
+
+                                                    <div class="comment-img">
+                                                        <!-- <div> -->
+                                                                                <img src="wwwroot/customer/images/feedbacks/anh-1.jpg" alt="anh">
+                                                        <!-- </div> -->
+                                                    </div>
+                                                    <div>
+                                                        <div>
+                                                                                            <span style="font-weight: bold;font-size: 1rem;">${feedback.userName}</span>
+                                                            <div>
+                                                                    ${starsHtml}
+                                                            </div>
+                                                            <div>
+                                                                <span style="font-size: 0.9em;">
+                                                                                    2024-01-01 12:34 | Phan loai: ${feedback.productName} - 70% ice -
+                                                                    30% sugar
+                                                                </span>
+                                                            </div>
+                                                            <div>
+                                                                <div style="margin-bottom: 17px;">
+                                                                            <span style="font-weight: 400;">${feedback.description}</span>
+                                                                </div>
+                                                                <div>
+                                                                                    <img style="width: 72px;height: 72px;" src="${feedback.imagesFeedback}" alt="anh">
+                                                                </div>
+                                                            </div>
+                                                            <div style="margin-top: 10px;">
+                                                                <a class="btn-like" href="">
+                                                                    <i class="fa-solid fa-thumbs-up"
+                                                                       style="color: #ccc;"></i>
+                                                                </a>
+                                                                <span>69</span>
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                `;
+                            });
+                            console.log(htmls);
+                            var html = htmls.join('');
+                            document.getElementById('feedback-data').innerHTML = html;
+                        }
+                    })
+                    .catch((err) => {
+                        console.log('error')
+                    })
+            });
+        });
+    </script>
+    <script>
+        $(document).ready(function () {
+            var starValue = 6;
+            fetch(`/Products/Feedback?idProduct=${@Model.Id}&star=${starValue}`)
+                .then((response) => {
+                    return response.json();
+                })
+                .then((data) => {
+                    console.log(data);
+                    if (data.length === 0) {
+                        var html = `<h3 style="margin-top: 10px">No Feedback</h3>`;
+                        document.getElementById('feedback-data').innerHTML = html;
+                    } else {
+                        var htmls = data.map((feedback) => {
+                            var starsHtml = '';
+                            for (var i = 1; i <= 5; i++) {
+                                if (i < feedback.vote) {
+                                    starsHtml += '<i class="fa-solid fa-star" style="color: #FFD43B;"></i>';
+                                } else {
+                                    starsHtml += '<i class="fa-regular fa-star" style="color: #FFD43B;"></i>';
+                                }
+                            }
+                            return `<div class="comment-container">
+                                                <div class="comment-img">
+                                                    <img src="wwwroot/customer/images/feedbacks/anh-1.jpg" alt="anh">
+                                                </div>
+                                                <div>
+                                                    <div>
+                                                        <span style="font-weight: bold;font-size: 1rem;">${feedback.userName}</span>
+                                                        <div>${starsHtml}</div>
+                                                        <div>
+                                                            <span style="font-size: 0.9em;">
+                                                                2024-01-01 12:34 | Phan loai: ${feedback.productName} - 70% ice - 30% sugar
+                                                            </span>
+                                                        </div>
+                                                        <div>
+                                                            <div style="margin-bottom: 17px;">
+                                                                <span style="font-weight: 400;">${feedback.description}</span>
+                                                            </div>
+                                                            <div>
+                                                                <img style="width: 72px;height: 72px;" src="${feedback.imagesFeedback}" alt="anh">
+                                                            </div>
+                                                        </div>
+                                                        <div style="margin-top: 10px;">
+                                                            <a class="btn-like" href="">
+                                                                <i class="fa-solid fa-thumbs-up" style="color: #ccc;"></i>
+                                                            </a>
+                                                            <span>69</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>`;
+                        });
+                        console.log(htmls);
+                        var html = htmls.join('');
+                        document.getElementById('feedback-data').innerHTML = html;
                     }
+                })
+                .catch((err) => {
+                    console.log('error')
+                })
+        });
+    </script>
+}

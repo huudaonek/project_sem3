@@ -16,5 +16,6 @@ namespace CoffeeLands.Models
         public string Role { get; set; }
 		public bool Is_active { get; set; }
 		public ICollection<OrderProduct>? OrderProducts { get; set; }
-	}
+        public ICollection<Feedback>? Feedbacks { get; set; }
+    }
 }

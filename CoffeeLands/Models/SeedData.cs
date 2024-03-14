@@ -7,6 +7,7 @@ using System.Linq;
 using Faker;
 using Bogus;
 using Bogus.DataSets;
+using CoffeeLands.ViewModels;
 
 namespace CoffeeLands.Models;
 
@@ -69,6 +70,23 @@ public static class SeedData
             }
             context.SaveChanges();
 
+
+            var feedbackFaker = new Faker<Feedback>()
+    .RuleFor(p => p.Vote, f => f.Random.Number(1, 5))
+    .RuleFor(p => p.imagesFeedback, f => $"/customer/images/feedbacks/anh-{f.Random.Number(1, 5)}.jpg")
+    .RuleFor(p => p.Description, f => f.Lorem.Sentence())
+    .RuleFor(p => p.UserID, f => f.PickRandom(users).Id)
+    .RuleFor(p => p.ProductID, f => f.PickRandom(products).Id);
+
+            var feedbacks = feedbackFaker.Generate(50); 
+
+            foreach (var feedback in feedbacks)
+            {
+                context.Feedback.Add(feedback);
+            }
+            context.SaveChanges();
+
+           
         }
     }
 }
