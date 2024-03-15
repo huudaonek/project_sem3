@@ -117,7 +117,7 @@ namespace CoffeeLands.Controllers
             {
                 return NotFound();
             }
-
+            
             var feedbacks = await _context.Feedback
                                 .Include(u => u.User)
                 .Include(p => p.Product)
@@ -142,15 +142,53 @@ namespace CoffeeLands.Controllers
             }
 
             var query = feedbackVMList.Where(f => f.ProductId == idProduct);
-
             if (star != null && star <= 5)
             {
                 query = query.Where(f => f.Vote == star);
             }
 
-            var result = query.ToArray();
+            var result = query.OrderByDescending(f => f.Vote).Take(10).ToArray();
 
             return Ok(result);
+        }
+
+        
+        public async Task<IActionResult> ShowMoreFeedback(int? idProduct, int countCurrent = 0)
+        {
+            if (idProduct == null)
+            {
+                return NotFound();
+            }
+            var feedbacks = await _context.Feedback
+                                .Include(u => u.User)
+                .Include(p => p.Product)
+                .ThenInclude(c => c.Category)
+                .ToListAsync();
+            List<FeedbackVM> feedbackVMList = new List<FeedbackVM>();
+
+            foreach (var feedback in feedbacks)
+            {
+                var item = new FeedbackVM
+                {
+                    Id = feedback.Id,
+                    Vote = feedback.Vote,
+                    imagesFeedback = feedback.imagesFeedback,
+                    Description = feedback.Description,
+                    UserName = feedback.User.Name,
+                    UserImage = "~/wwwroot/customer/images/feedbacks/anh-1.jpg",
+                    ProductId = feedback.Product.Id,
+                    ProductName = feedback.Product.Name
+                };
+                feedbackVMList.Add(item);
+            }
+
+            var query = feedbackVMList.Where(f => f.ProductId == idProduct);
+
+
+            var result = query.OrderByDescending(f => f.Vote).Take(3).ToArray();
+
+            return Ok(result);
+
         }
 
         #region Create Product

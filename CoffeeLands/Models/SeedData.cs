@@ -76,7 +76,7 @@ public static class SeedData
     .RuleFor(p => p.imagesFeedback, f => $"/customer/images/feedbacks/anh-{f.Random.Number(1, 5)}.jpg")
     .RuleFor(p => p.Description, f => f.Lorem.Sentence())
     .RuleFor(p => p.UserID, f => f.PickRandom(users).Id)
-    .RuleFor(p => p.ProductID, f => f.PickRandom(products).Id);
+    .RuleFor(p => p.ProductID, f => f.Random.Number(1, 10));
 
             var feedbacks = feedbackFaker.Generate(50); 
 

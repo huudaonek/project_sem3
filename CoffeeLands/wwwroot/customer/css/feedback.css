@@ -50,3 +50,18 @@
 .btn-like i:hover {
     color: yellow !important;
 }
+
+.show-more {
+    padding: 15px 502px;
+    border: 1px solid #f1f1f1;
+    text-align: center;
+    color: #f1f1f1;
+    font-size: 1rem;
+    font-weight: 400;
+}
+
+
+    .show-more:hover {
+        background-color: #ccc;
+        color: black;
+    }

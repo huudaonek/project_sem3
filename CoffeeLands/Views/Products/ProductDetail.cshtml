@@ -93,67 +93,93 @@
         <div class="feedback-container">
 
             <div style="border-top: 1px solid #f1f1f1;"></div>
-            <h1>Feedback</h1>
-            <div style="border: 1px solid white;height: 130px">
-                <div class="star-rating">
-                    <div style="width: 12%;">
-                        <span style="color: yellow;"> <label style="font-size: 20px;">4.9</label> / 5.0</span>
+            
+            @{
+                var vote = 0;
+                double avgVote = 0;
+                var vote1 = 0;
+                var vote2 = 0;
+                var vote3 = 0;
+                var vote4 = 0;
+                var vote5 = 0;
+                foreach (var item in Model.Feedbacks)
+                {
+                    if (item.Vote == 1)
+                    {
+                        vote1++;
+                    }
+                    else if (item.Vote == 2)
+                    {
+                        vote2++;
+                    }
+                    else if (item.Vote == 3)
+                    {
+                        vote3++;
+                    }
+                    else if (item.Vote == 4)
+                    {
+                        vote4++;
+                    }
+                    else if (item.Vote == 5)
+                    {
+                        vote5++;
+                    }
+                    vote++;
+                    avgVote += item.Vote;
+                }
+                if (avgVote > 0)
+                {
+                    avgVote = avgVote / vote;
+                }
+
+                string formattedAvgVote = avgVote.ToString("0.0");
+            }
+
+                <h1>Feedback</h1>
+                <div style="border: 1px solid white;height: 130px">
+                    <div class="star-rating">
+                        <div style="width: 12%;">
+
+
+                            <span style="color: yellow;"> <label style="font-size: 20px;">@formattedAvgVote</label> / 5.0</span>
+                            <div>
+                                @{
+
+                                    for (var i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= avgVote)
+                                        {
+                                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                                        }
+                                        else if (i > avgVote && i - avgVote >= 1)
+                                        {
+                                            <i class="fa-regular fa-star" style="color: #FFD43B;"></i>
+                                        }
+                                        else 
+                                        {
+                                            <i class="fa-solid fa-star-half-alt" style="color: #FFD43B;"></i>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+
                         <div>
-                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
-                            <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                            <ul class="rank">
+                                <li>
+                                    <a class="getVote" href="" data-star="6">All (@vote)</a>
+                                </li>
+                                <li><a class="getVote" href="" data-star="5">5 Star (@vote5)</a></li>
+                                <li><a class="getVote" href="" data-star="4">4 Star (@vote4)</a></li>
+                                <li><a class="getVote" href="" data-star="3">3 Star (@vote3)</a></li>
+                                <li><a class="getVote" href="" data-star="2">2 Star (@vote2)</a></li>
+                                <li><a class="getVote" href="" data-star="1">1 Star (@vote1)</a></li>
+                            </ul>
                         </div>
                     </div>
-                    @{
-                        var vote = 0;
-                        var vote1 = 0;
-                        var vote2 = 0;
-                        var vote3 = 0;
-                        var vote4 = 0;
-                        var vote5 = 0;
-                        foreach (var item in Model.Feedbacks)
-                        {
-                            if (item.Vote == 1)
-                            {
-                                vote1++;
-                            }
-                            else if (item.Vote == 2)
-                            {
-                                vote2++;
-                            }
-                            else if (item.Vote == 3)
-                            {
-                                vote3++;
-                            }
-                            else if (item.Vote == 4)
-                            {
-                                vote4++;
-                            }
-                            else if (item.Vote == 5)
-                            {
-                                vote5++;
-                            }
-                            vote++;
-                        }
-                    }
-                    <div>
-                        <ul class="rank">
-                            <li>
-                                <a class="getVote" href="" data-star="6">All (@vote)</a>
-                            </li>
-                            <li><a class="getVote" href="" data-star="5">5 Star (@vote5)</a></li>
-                            <li><a class="getVote" href="" data-star="4">4 Star (@vote4)</a></li>
-                            <li><a class="getVote" href="" data-star="3">3 Star (@vote3)</a></li>
-                            <li><a class="getVote" href="" data-star="2">2 Star (@vote2)</a></li>
-                            <li><a class="getVote" href="" data-star="1">1 Star (@vote1)</a></li>
-                        </ul>
-                    </div>
                 </div>
-            </div>
 
-            <div id="feedback-data"></div>
+                <div id="feedback-data"></div>
         </div>
     </div>
 </section>
@@ -249,6 +275,7 @@
                 // var star = $(event.target).find('span').text().split(" ")[0];
                 console.log(starValue);
 
+
                 fetch(`/Products/Feedback?idProduct=${@Model.Id}&star=${starValue}`)
                     .then((response) => {
                         return response.json();
@@ -264,14 +291,14 @@
                             var htmls = data.map((feedback) => {
                                 var starsHtml = '';
                                 for (var i = 1; i <= 5; i++) {
-                                    if (i < feedback.vote) {
+                                    if (i <= feedback.vote) {
                                         starsHtml += '<i class="fa-solid fa-star" style="color: #FFD43B;"></i>';
                                     } else {
                                         starsHtml += '<i class="fa-regular fa-star" style="color: #FFD43B;"></i>';
                                     }
                                 }
                                 return `<div class="comment-container">
-
+                                                        
                                                     <div class="comment-img">
                                                         <!-- <div> -->
                                                                                 <img src="wwwroot/customer/images/feedbacks/anh-1.jpg" alt="anh">
@@ -285,13 +312,14 @@
                                                             </div>
                                                             <div>
                                                                 <span style="font-size: 0.9em;">
-                                                                                    2024-01-01 12:34 | Phan loai: ${feedback.productName} - 70% ice -
+                                                                                    2024-01-01 12:34 | Type: ${feedback.productName} - 70% ice -
                                                                     30% sugar
                                                                 </span>
                                                             </div>
                                                             <div>
                                                                 <div style="margin-bottom: 17px;">
                                                                             <span style="font-weight: 400;">${feedback.description}</span>
+                                                                                    
                                                                 </div>
                                                                 <div>
                                                                                     <img style="width: 72px;height: 72px;" src="${feedback.imagesFeedback}" alt="anh">
@@ -311,6 +339,11 @@
                                                 `;
                             });
                             console.log(htmls);
+                            
+                        //     var showMore = `<div style="margin-top: 40px;">
+                        //                     <a href="" class="getVote show-more" id="show-more" data-star="0">Show more...</a>
+
+                        // </div>`;
                             var html = htmls.join('');
                             document.getElementById('feedback-data').innerHTML = html;
                         }
@@ -337,7 +370,7 @@
                         var htmls = data.map((feedback) => {
                             var starsHtml = '';
                             for (var i = 1; i <= 5; i++) {
-                                if (i < feedback.vote) {
+                                if (i <= feedback.vote) {
                                     starsHtml += '<i class="fa-solid fa-star" style="color: #FFD43B;"></i>';
                                 } else {
                                     starsHtml += '<i class="fa-regular fa-star" style="color: #FFD43B;"></i>';
